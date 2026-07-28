@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+.tools/
+
+# Runtime state and generated artifacts
+.ml-platform/
+.demo/
+artifacts/
+dist/
+build/
+pipeline.yaml
+benchmark-results/
+mlruns/
+
+# Tooling and OS
+.env
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Local secrets
+*.pem
+*.key
+secrets/

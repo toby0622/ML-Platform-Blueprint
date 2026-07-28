@@ -1,0 +1,25 @@
+name: Platform capability
+description: Propose a capability with an explicit user outcome
+title: "[capability] "
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    attributes:
+      label: Platform user and problem
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reliability, security, and cost impact
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives and trade-offs
+    validations:
+      required: true

@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ml-platform-blueprint"
+version = "0.1.0"
+description = "Production-style multi-tenant ML platform reference implementation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "ML Platform Blueprint contributors" }]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "numpy>=2.0,<3",
+  "pydantic>=2.10,<3",
+  "uvicorn>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28,<1",
+  "mypy>=1.15,<2",
+  "pytest>=8.3,<10",
+  "pytest-cov>=6,<8",
+  "PyYAML>=6,<7",
+  "ruff>=0.11,<1",
+]
+mlflow = ["mlflow==3.14.0"]
+kfp = ["kfp==2.16.0"]
+otel = [
+  "opentelemetry-exporter-otlp-proto-http==1.44.0",
+  "opentelemetry-instrumentation-fastapi==0.65b0",
+  "opentelemetry-sdk==1.44.0",
+]
+all = [
+  "mlflow==3.14.0",
+  "kfp==2.16.0",
+  "opentelemetry-exporter-otlp-proto-http==1.44.0",
+  "opentelemetry-instrumentation-fastapi==0.65b0",
+  "opentelemetry-sdk==1.44.0",
+]
+
+[project.scripts]
+ml-platform = "ml_platform_blueprint.cli:main"
+ml-model-server = "ml_platform_blueprint.model_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ml_platform_blueprint"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "integration: exercises multiple platform components",
+  "e2e: exercises the public API or CLI",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests", "pipelines"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/ml_platform_blueprint"]
+warn_unreachable = true
+
+[tool.coverage.run]
+branch = true
+source = ["ml_platform_blueprint"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80

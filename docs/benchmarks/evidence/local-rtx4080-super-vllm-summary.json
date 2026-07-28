@@ -1,0 +1,1058 @@
+{
+  "cuda_container_smoke": {
+    "image": "nvidia/cuda:13.0.2-base-ubuntu24.04",
+    "image_digest": "sha256:2ab6381d970b211fb93853796dc6707eb8a72575a375c422b17cf4d8b2641701",
+    "observed_compute_capability": 8.9,
+    "observed_driver_version": "610.74",
+    "observed_gpu": "NVIDIA GeForce RTX 4080 SUPER",
+    "observed_memory_total_mib": 16376,
+    "status": "passed"
+  },
+  "environment": {
+    "docker_client": "Docker version 29.6.2, build dfc4efb",
+    "docker_compose": "Docker Compose version v5.3.1",
+    "docker_desktop_version": "4.84.0",
+    "docker_engine": {
+      "nvidia_runtime_detected": true,
+      "operating_system": "Docker Desktop",
+      "os_type": "linux"
+    },
+    "docker_server_version": "29.6.2",
+    "gpu": {
+      "compute_capability": 8.9,
+      "driver_version": "610.74",
+      "index": 0,
+      "memory_total_mib": 16376,
+      "name": "NVIDIA GeForce RTX 4080 SUPER"
+    },
+    "host_os": "Windows",
+    "wsl": {
+      "applicable": true,
+      "available": true,
+      "status": "ready",
+      "version": "WSL \u7248\u672c\uff1a 2.2.4.0",
+      "wsl2_detected": true
+    }
+  },
+  "kind": "local-rtx4080-super-vllm-benchmark-summary",
+  "limitations": [
+    "One Windows 11 workstation using Docker Desktop and WSL 2.",
+    "The physical display GPU was host-shared; Compose did not provide exclusivity.",
+    "Local loopback client, one unquantized 1.5B model, and one GPU only.",
+    "No Kubernetes, autoscaling, multi-GPU, DCGM, quality, or cost measurement.",
+    "WSL pin_memory was disabled by vLLM and may differ from native Linux."
+  ],
+  "preflight_artifact": {
+    "path": "docs/benchmarks/evidence/local-rtx4080-super-preflight.json",
+    "sha256": "a931dc1b7cc894928817038733169e08aa749208357aa7dddb2670ee3a3afe04"
+  },
+  "reviewed_on": "2026-07-28",
+  "runtime": {
+    "api_validation": {
+      "chat_expected": "GPU Docker path works.",
+      "chat_observed": "GPU Docker path works.",
+      "health_status": 200,
+      "models_id": "qwen2.5-1.5b-instruct"
+    },
+    "endpoint_bind": "127.0.0.1:8000",
+    "image_id": "sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f",
+    "image_reference": "vllm/vllm-openai:v0.23.0@sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f",
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "repo_digests": [
+      "vllm/vllm-openai@sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f"
+    ],
+    "served_model_name": "qwen2.5-1.5b-instruct",
+    "vllm_version": "0.23.0"
+  },
+  "scenarios": [
+    {
+      "aggregate_error_rate": 0.0,
+      "engine_args": {
+        "enable_prefix_caching": false,
+        "gpu_memory_utilization": 0.75,
+        "max_model_len": 4096,
+        "max_num_batched_tokens": 4096
+      },
+      "gpu_telemetry": {
+        "collection_seconds": 79.339,
+        "gpu": {
+          "driver_versions_observed": [
+            "610.74"
+          ],
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4080 SUPER"
+        },
+        "metrics": {
+          "gpu_utilization_percent": {
+            "max": 99.0,
+            "p50": 98.0,
+            "p95": 99.0
+          },
+          "memory_used_mib": {
+            "max": 15224.0,
+            "p50": 14858.0,
+            "p95": 15138.5
+          },
+          "memory_utilization_percent": {
+            "max": 97.0,
+            "p50": 94.0,
+            "p95": 96.0
+          },
+          "power_draw_watts": {
+            "max": 232.28,
+            "p50": 219.725,
+            "p95": 231.45
+          },
+          "power_limit_watts": {
+            "max": 320.0,
+            "p50": 320.0,
+            "p95": 320.0
+          },
+          "temperature_celsius": {
+            "max": 65.0,
+            "p50": 62.0,
+            "p95": 65.0
+          }
+        },
+        "sample_count": 76
+      },
+      "measured_requests": 300,
+      "name": "baseline",
+      "quality_gate": {
+        "max_error_rate": 0.0,
+        "passed": true,
+        "violations": []
+      },
+      "raw_artifacts": {
+        "benchmark": {
+          "path": "benchmark-results/vllm-baseline.json",
+          "sha256": "7983986a01f7e5bcb13b5d75cbcd270d0be43ffad4cebb1e142eec8e8437e266"
+        },
+        "gpu_telemetry": {
+          "path": "benchmark-results/vllm-baseline-gpu-telemetry.json",
+          "sha256": "59a9b9656b114773db41fb32ac5c830ebc9d11e4ee29de25f0c842a9ff3e6aa6"
+        },
+        "manifest": {
+          "path": "benchmark-results/vllm-baseline-manifest.json",
+          "sha256": "b8d6da47542559d76705f770734debb2adca982e3919784610922d089c03c6d3"
+        }
+      },
+      "results_by_concurrency": {
+        "1": {
+          "aggregate": {
+            "end_to_end_p50_ms": 734.98,
+            "end_to_end_p95_ms": 750.913,
+            "mean_itl_ms": 5.658,
+            "output_throughput_tokens_per_second": 171.956,
+            "request_throughput_rps": 1.81,
+            "ttft_p50_ms": 14.654,
+            "ttft_p95_ms": 16.384
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 739.175,
+              "median": 734.76,
+              "min": 734.195
+            },
+            "end_to_end_p95_ms": {
+              "max": 771.65,
+              "median": 740.912,
+              "min": 739.267
+            },
+            "mean_itl_ms": {
+              "max": 5.717,
+              "median": 5.634,
+              "min": 5.624
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 173.033,
+              "median": 172.806,
+              "min": 170.062
+            },
+            "request_throughput_rps": {
+              "max": 1.821,
+              "median": 1.819,
+              "min": 1.79
+            },
+            "ttft_p50_ms": {
+              "max": 14.926,
+              "median": 14.611,
+              "min": 14.323
+            },
+            "ttft_p95_ms": {
+              "max": 16.55,
+              "median": 16.157,
+              "min": 16.092
+            }
+          }
+        },
+        "16": {
+          "aggregate": {
+            "end_to_end_p50_ms": 826.017,
+            "end_to_end_p95_ms": 850.103,
+            "mean_itl_ms": 6.09,
+            "output_throughput_tokens_per_second": 1861.453,
+            "request_throughput_rps": 18.818,
+            "ttft_p50_ms": 50.056,
+            "ttft_p95_ms": 61.197
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 846.259,
+              "median": 826.017,
+              "min": 797.521
+            },
+            "end_to_end_p95_ms": {
+              "max": 851.475,
+              "median": 834.45,
+              "min": 830.579
+            },
+            "mean_itl_ms": {
+              "max": 6.134,
+              "median": 6.11,
+              "min": 6.026
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1928.311,
+              "median": 1890.923,
+              "min": 1764.539
+            },
+            "request_throughput_rps": {
+              "max": 18.943,
+              "median": 18.942,
+              "min": 18.575
+            },
+            "ttft_p50_ms": {
+              "max": 57.713,
+              "median": 52.557,
+              "min": 42.937
+            },
+            "ttft_p95_ms": {
+              "max": 62.386,
+              "median": 56.533,
+              "min": 47.109
+            }
+          }
+        },
+        "2": {
+          "aggregate": {
+            "end_to_end_p50_ms": 777.075,
+            "end_to_end_p95_ms": 821.161,
+            "mean_itl_ms": 5.9,
+            "output_throughput_tokens_per_second": 307.583,
+            "request_throughput_rps": 3.288,
+            "ttft_p50_ms": 23.276,
+            "ttft_p95_ms": 26.215
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 779.825,
+              "median": 775.312,
+              "min": 774.533
+            },
+            "end_to_end_p95_ms": {
+              "max": 825.923,
+              "median": 783.977,
+              "min": 780.415
+            },
+            "mean_itl_ms": {
+              "max": 5.936,
+              "median": 5.897,
+              "min": 5.866
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 309.94,
+              "median": 307.673,
+              "min": 305.183
+            },
+            "request_throughput_rps": {
+              "max": 3.322,
+              "median": 3.285,
+              "min": 3.257
+            },
+            "ttft_p50_ms": {
+              "max": 23.446,
+              "median": 23.258,
+              "min": 23.192
+            },
+            "ttft_p95_ms": {
+              "max": 26.215,
+              "median": 26.06,
+              "min": 25.366
+            }
+          }
+        },
+        "4": {
+          "aggregate": {
+            "end_to_end_p50_ms": 803.823,
+            "end_to_end_p95_ms": 822.532,
+            "mean_itl_ms": 6.126,
+            "output_throughput_tokens_per_second": 577.416,
+            "request_throughput_rps": 6.16,
+            "ttft_p50_ms": 24.269,
+            "ttft_p95_ms": 33.117
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 812.795,
+              "median": 803.26,
+              "min": 799.909
+            },
+            "end_to_end_p95_ms": {
+              "max": 832.563,
+              "median": 814.03,
+              "min": 812.625
+            },
+            "mean_itl_ms": {
+              "max": 6.18,
+              "median": 6.103,
+              "min": 6.094
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 581.828,
+              "median": 579.646,
+              "min": 570.87
+            },
+            "request_throughput_rps": {
+              "max": 6.193,
+              "median": 6.19,
+              "min": 6.099
+            },
+            "ttft_p50_ms": {
+              "max": 24.768,
+              "median": 23.965,
+              "min": 23.593
+            },
+            "ttft_p95_ms": {
+              "max": 37.588,
+              "median": 33.117,
+              "min": 25.003
+            }
+          }
+        },
+        "8": {
+          "aggregate": {
+            "end_to_end_p50_ms": 815.547,
+            "end_to_end_p95_ms": 894.477,
+            "mean_itl_ms": 6.261,
+            "output_throughput_tokens_per_second": 989.395,
+            "request_throughput_rps": 10.472,
+            "ttft_p50_ms": 30.257,
+            "ttft_p95_ms": 38.71
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 878.801,
+              "median": 808.763,
+              "min": 807.894
+            },
+            "end_to_end_p95_ms": {
+              "max": 907.32,
+              "median": 832.002,
+              "min": 826.514
+            },
+            "mean_itl_ms": {
+              "max": 6.494,
+              "median": 6.146,
+              "min": 6.144
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1008.008,
+              "median": 1006.898,
+              "min": 955.451
+            },
+            "request_throughput_rps": {
+              "max": 10.712,
+              "median": 10.678,
+              "min": 10.052
+            },
+            "ttft_p50_ms": {
+              "max": 31.437,
+              "median": 31.21,
+              "min": 26.594
+            },
+            "ttft_p95_ms": {
+              "max": 44.061,
+              "median": 37.33,
+              "min": 33.665
+            }
+          }
+        }
+      }
+    },
+    {
+      "aggregate_error_rate": 0.0,
+      "engine_args": {
+        "enable_prefix_caching": true,
+        "gpu_memory_utilization": 0.75,
+        "max_model_len": 4096,
+        "max_num_batched_tokens": 4096
+      },
+      "gpu_telemetry": {
+        "collection_seconds": 80.154,
+        "gpu": {
+          "driver_versions_observed": [
+            "610.74"
+          ],
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4080 SUPER"
+        },
+        "metrics": {
+          "gpu_utilization_percent": {
+            "max": 100.0,
+            "p50": 98.0,
+            "p95": 99.0
+          },
+          "memory_used_mib": {
+            "max": 15219.0,
+            "p50": 14899.0,
+            "p95": 15187.4
+          },
+          "memory_utilization_percent": {
+            "max": 97.0,
+            "p50": 93.0,
+            "p95": 96.0
+          },
+          "power_draw_watts": {
+            "max": 232.26,
+            "p50": 220.48,
+            "p95": 230.928
+          },
+          "power_limit_watts": {
+            "max": 320.0,
+            "p50": 320.0,
+            "p95": 320.0
+          },
+          "temperature_celsius": {
+            "max": 65.0,
+            "p50": 62.0,
+            "p95": 65.0
+          }
+        },
+        "sample_count": 77
+      },
+      "measured_requests": 300,
+      "name": "prefix-cache",
+      "quality_gate": {
+        "max_error_rate": 0.0,
+        "passed": true,
+        "violations": []
+      },
+      "raw_artifacts": {
+        "benchmark": {
+          "path": "benchmark-results/vllm-prefix-cache.json",
+          "sha256": "b70a49614256311c306034c219a0d2d5bbb0544af69f5eb2911d908f370309ea"
+        },
+        "gpu_telemetry": {
+          "path": "benchmark-results/vllm-prefix-cache-gpu-telemetry.json",
+          "sha256": "1adf672ce35de296df68e2684d128248f9d0e3d7cfc350a00e9b51e3d7fe04ee"
+        },
+        "manifest": {
+          "path": "benchmark-results/vllm-prefix-cache-manifest.json",
+          "sha256": "f1c1d6e326b16c145c660a33a1312de7ff3c86dc356052fc96da0c2783d063ff"
+        }
+      },
+      "results_by_concurrency": {
+        "1": {
+          "aggregate": {
+            "end_to_end_p50_ms": 733.905,
+            "end_to_end_p95_ms": 767.664,
+            "mean_itl_ms": 5.704,
+            "output_throughput_tokens_per_second": 170.665,
+            "request_throughput_rps": 1.793,
+            "ttft_p50_ms": 14.278,
+            "ttft_p95_ms": 17.777
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 738.135,
+              "median": 734.743,
+              "min": 730.665
+            },
+            "end_to_end_p95_ms": {
+              "max": 778.59,
+              "median": 768.578,
+              "min": 752.618
+            },
+            "mean_itl_ms": {
+              "max": 5.718,
+              "median": 5.701,
+              "min": 5.693
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 171.345,
+              "median": 170.533,
+              "min": 170.121
+            },
+            "request_throughput_rps": {
+              "max": 1.8,
+              "median": 1.791,
+              "min": 1.787
+            },
+            "ttft_p50_ms": {
+              "max": 14.578,
+              "median": 14.407,
+              "min": 13.995
+            },
+            "ttft_p95_ms": {
+              "max": 17.794,
+              "median": 17.783,
+              "min": 17.327
+            }
+          }
+        },
+        "16": {
+          "aggregate": {
+            "end_to_end_p50_ms": 790.774,
+            "end_to_end_p95_ms": 804.655,
+            "mean_itl_ms": 5.982,
+            "output_throughput_tokens_per_second": 1837.141,
+            "request_throughput_rps": 19.23,
+            "ttft_p50_ms": 28.82,
+            "ttft_p95_ms": 33.225
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 799.851,
+              "median": 795.699,
+              "min": 782.329
+            },
+            "end_to_end_p95_ms": {
+              "max": 806.228,
+              "median": 803.386,
+              "min": 792.724
+            },
+            "mean_itl_ms": {
+              "max": 6.012,
+              "median": 6.003,
+              "min": 5.932
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1856.812,
+              "median": 1853.432,
+              "min": 1800.821
+            },
+            "request_throughput_rps": {
+              "max": 19.582,
+              "median": 19.332,
+              "min": 18.794
+            },
+            "ttft_p50_ms": {
+              "max": 29.95,
+              "median": 28.82,
+              "min": 27.607
+            },
+            "ttft_p95_ms": {
+              "max": 34.33,
+              "median": 31.438,
+              "min": 31.393
+            }
+          }
+        },
+        "2": {
+          "aggregate": {
+            "end_to_end_p50_ms": 774.665,
+            "end_to_end_p95_ms": 799.339,
+            "mean_itl_ms": 5.921,
+            "output_throughput_tokens_per_second": 307.092,
+            "request_throughput_rps": 3.227,
+            "ttft_p50_ms": 22.992,
+            "ttft_p95_ms": 29.372
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 775.346,
+              "median": 773.992,
+              "min": 773.322
+            },
+            "end_to_end_p95_ms": {
+              "max": 806.015,
+              "median": 800.817,
+              "min": 781.003
+            },
+            "mean_itl_ms": {
+              "max": 5.974,
+              "median": 5.907,
+              "min": 5.881
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 308.792,
+              "median": 306.641,
+              "min": 305.848
+            },
+            "request_throughput_rps": {
+              "max": 3.233,
+              "median": 3.226,
+              "min": 3.221
+            },
+            "ttft_p50_ms": {
+              "max": 23.093,
+              "median": 23.033,
+              "min": 22.519
+            },
+            "ttft_p95_ms": {
+              "max": 29.502,
+              "median": 28.47,
+              "min": 27.92
+            }
+          }
+        },
+        "4": {
+          "aggregate": {
+            "end_to_end_p50_ms": 798.631,
+            "end_to_end_p95_ms": 844.28,
+            "mean_itl_ms": 6.138,
+            "output_throughput_tokens_per_second": 577.946,
+            "request_throughput_rps": 6.114,
+            "ttft_p50_ms": 23.79,
+            "ttft_p95_ms": 83.771
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 811.213,
+              "median": 798.116,
+              "min": 797.373
+            },
+            "end_to_end_p95_ms": {
+              "max": 867.698,
+              "median": 844.28,
+              "min": 803.893
+            },
+            "mean_itl_ms": {
+              "max": 6.275,
+              "median": 6.078,
+              "min": 6.06
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 590.658,
+              "median": 575.079,
+              "min": 568.534
+            },
+            "request_throughput_rps": {
+              "max": 6.24,
+              "median": 6.098,
+              "min": 6.007
+            },
+            "ttft_p50_ms": {
+              "max": 24.405,
+              "median": 24.194,
+              "min": 23.301
+            },
+            "ttft_p95_ms": {
+              "max": 85.943,
+              "median": 27.967,
+              "min": 24.75
+            }
+          }
+        },
+        "8": {
+          "aggregate": {
+            "end_to_end_p50_ms": 798.259,
+            "end_to_end_p95_ms": 809.553,
+            "mean_itl_ms": 6.073,
+            "output_throughput_tokens_per_second": 1029.405,
+            "request_throughput_rps": 10.951,
+            "ttft_p50_ms": 24.441,
+            "ttft_p95_ms": 26.938
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 803.956,
+              "median": 799.326,
+              "min": 793.0
+            },
+            "end_to_end_p95_ms": {
+              "max": 810.348,
+              "median": 808.206,
+              "min": 803.655
+            },
+            "mean_itl_ms": {
+              "max": 6.11,
+              "median": 6.077,
+              "min": 6.032
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1036.068,
+              "median": 1027.314,
+              "min": 1024.9
+            },
+            "request_throughput_rps": {
+              "max": 11.022,
+              "median": 10.929,
+              "min": 10.903
+            },
+            "ttft_p50_ms": {
+              "max": 24.654,
+              "median": 24.361,
+              "min": 23.723
+            },
+            "ttft_p95_ms": {
+              "max": 27.103,
+              "median": 26.964,
+              "min": 25.615
+            }
+          }
+        }
+      }
+    },
+    {
+      "aggregate_error_rate": 0.0,
+      "engine_args": {
+        "enable_prefix_caching": false,
+        "gpu_memory_utilization": 0.75,
+        "max_model_len": 4096,
+        "max_num_batched_tokens": 128
+      },
+      "gpu_telemetry": {
+        "collection_seconds": 80.809,
+        "gpu": {
+          "driver_versions_observed": [
+            "610.74"
+          ],
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4080 SUPER"
+        },
+        "metrics": {
+          "gpu_utilization_percent": {
+            "max": 100.0,
+            "p50": 98.0,
+            "p95": 99.0
+          },
+          "memory_used_mib": {
+            "max": 15532.0,
+            "p50": 15010.0,
+            "p95": 15336.6
+          },
+          "memory_utilization_percent": {
+            "max": 97.0,
+            "p50": 91.0,
+            "p95": 97.0
+          },
+          "power_draw_watts": {
+            "max": 232.97,
+            "p50": 219.97,
+            "p95": 230.228
+          },
+          "power_limit_watts": {
+            "max": 320.0,
+            "p50": 320.0,
+            "p95": 320.0
+          },
+          "temperature_celsius": {
+            "max": 66.0,
+            "p50": 63.0,
+            "p95": 65.0
+          }
+        },
+        "sample_count": 78
+      },
+      "measured_requests": 300,
+      "name": "constrained-batch",
+      "quality_gate": {
+        "max_error_rate": 0.0,
+        "passed": true,
+        "violations": []
+      },
+      "raw_artifacts": {
+        "benchmark": {
+          "path": "benchmark-results/vllm-constrained-batch.json",
+          "sha256": "bda1196348ca0835d93feca52858ae2b7285832a9b0aee3a2b5063abf7f8ba28"
+        },
+        "gpu_telemetry": {
+          "path": "benchmark-results/vllm-constrained-batch-gpu-telemetry.json",
+          "sha256": "14ea17b573f4289f1c5c3f63b5403d0d01eba508b14340fa6a2c0bfcf7b69a7e"
+        },
+        "manifest": {
+          "path": "benchmark-results/vllm-constrained-batch-manifest.json",
+          "sha256": "502d1ac2a1d4e224d4806291286c37c22bffa2d1bb0450dd5123a82c07fef441"
+        }
+      },
+      "results_by_concurrency": {
+        "1": {
+          "aggregate": {
+            "end_to_end_p50_ms": 734.797,
+            "end_to_end_p95_ms": 797.148,
+            "mean_itl_ms": 5.763,
+            "output_throughput_tokens_per_second": 168.646,
+            "request_throughput_rps": 1.775,
+            "ttft_p50_ms": 15.244,
+            "ttft_p95_ms": 18.682
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 737.313,
+              "median": 734.134,
+              "min": 731.493
+            },
+            "end_to_end_p95_ms": {
+              "max": 799.239,
+              "median": 795.498,
+              "min": 784.038
+            },
+            "mean_itl_ms": {
+              "max": 5.81,
+              "median": 5.79,
+              "min": 5.689
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 170.285,
+              "median": 168.206,
+              "min": 167.473
+            },
+            "request_throughput_rps": {
+              "max": 1.792,
+              "median": 1.771,
+              "min": 1.763
+            },
+            "ttft_p50_ms": {
+              "max": 15.943,
+              "median": 15.193,
+              "min": 14.938
+            },
+            "ttft_p95_ms": {
+              "max": 18.772,
+              "median": 18.734,
+              "min": 17.396
+            }
+          }
+        },
+        "16": {
+          "aggregate": {
+            "end_to_end_p50_ms": 829.528,
+            "end_to_end_p95_ms": 972.267,
+            "mean_itl_ms": 6.404,
+            "output_throughput_tokens_per_second": 1640.258,
+            "request_throughput_rps": 17.406,
+            "ttft_p50_ms": 83.711,
+            "ttft_p95_ms": 122.297
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 878.724,
+              "median": 806.982,
+              "min": 800.846
+            },
+            "end_to_end_p95_ms": {
+              "max": 978.471,
+              "median": 897.494,
+              "min": 867.476
+            },
+            "mean_itl_ms": {
+              "max": 6.815,
+              "median": 6.242,
+              "min": 6.156
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1714.53,
+              "median": 1673.318,
+              "min": 1542.531
+            },
+            "request_throughput_rps": {
+              "max": 18.172,
+              "median": 17.726,
+              "min": 16.419
+            },
+            "ttft_p50_ms": {
+              "max": 90.535,
+              "median": 82.772,
+              "min": 64.865
+            },
+            "ttft_p95_ms": {
+              "max": 123.008,
+              "median": 114.675,
+              "min": 92.279
+            }
+          }
+        },
+        "2": {
+          "aggregate": {
+            "end_to_end_p50_ms": 775.539,
+            "end_to_end_p95_ms": 835.967,
+            "mean_itl_ms": 5.985,
+            "output_throughput_tokens_per_second": 303.813,
+            "request_throughput_rps": 3.248,
+            "ttft_p50_ms": 23.308,
+            "ttft_p95_ms": 26.734
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 787.553,
+              "median": 776.094,
+              "min": 773.305
+            },
+            "end_to_end_p95_ms": {
+              "max": 867.195,
+              "median": 806.144,
+              "min": 780.504
+            },
+            "mean_itl_ms": {
+              "max": 6.173,
+              "median": 5.907,
+              "min": 5.876
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 309.476,
+              "median": 308.905,
+              "min": 293.624
+            },
+            "request_throughput_rps": {
+              "max": 3.311,
+              "median": 3.305,
+              "min": 3.134
+            },
+            "ttft_p50_ms": {
+              "max": 24.065,
+              "median": 23.049,
+              "min": 22.831
+            },
+            "ttft_p95_ms": {
+              "max": 27.839,
+              "median": 24.711,
+              "min": 24.124
+            }
+          }
+        },
+        "4": {
+          "aggregate": {
+            "end_to_end_p50_ms": 803.053,
+            "end_to_end_p95_ms": 819.724,
+            "mean_itl_ms": 6.111,
+            "output_throughput_tokens_per_second": 577.658,
+            "request_throughput_rps": 6.153,
+            "ttft_p50_ms": 24.994,
+            "ttft_p95_ms": 39.984
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 804.375,
+              "median": 802.271,
+              "min": 800.917
+            },
+            "end_to_end_p95_ms": {
+              "max": 837.413,
+              "median": 819.297,
+              "min": 814.703
+            },
+            "mean_itl_ms": {
+              "max": 6.122,
+              "median": 6.114,
+              "min": 6.097
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 580.771,
+              "median": 578.029,
+              "min": 574.199
+            },
+            "request_throughput_rps": {
+              "max": 6.178,
+              "median": 6.146,
+              "min": 6.135
+            },
+            "ttft_p50_ms": {
+              "max": 25.568,
+              "median": 24.456,
+              "min": 24.449
+            },
+            "ttft_p95_ms": {
+              "max": 55.175,
+              "median": 39.984,
+              "min": 25.611
+            }
+          }
+        },
+        "8": {
+          "aggregate": {
+            "end_to_end_p50_ms": 812.503,
+            "end_to_end_p95_ms": 962.08,
+            "mean_itl_ms": 6.298,
+            "output_throughput_tokens_per_second": 965.78,
+            "request_throughput_rps": 10.293,
+            "ttft_p50_ms": 33.353,
+            "ttft_p95_ms": 114.164
+          },
+          "three_run_distribution": {
+            "end_to_end_p50_ms": {
+              "max": 840.583,
+              "median": 814.402,
+              "min": 804.034
+            },
+            "end_to_end_p95_ms": {
+              "max": 966.454,
+              "median": 907.316,
+              "min": 822.779
+            },
+            "mean_itl_ms": {
+              "max": 6.425,
+              "median": 6.367,
+              "min": 6.101
+            },
+            "output_throughput_tokens_per_second": {
+              "max": 1014.894,
+              "median": 953.073,
+              "min": 932.947
+            },
+            "request_throughput_rps": {
+              "max": 10.802,
+              "median": 10.144,
+              "min": 9.967
+            },
+            "ttft_p50_ms": {
+              "max": 47.686,
+              "median": 41.147,
+              "min": 28.273
+            },
+            "ttft_p95_ms": {
+              "max": 114.808,
+              "median": 69.714,
+              "min": 43.078
+            }
+          }
+        }
+      }
+    }
+  ],
+  "schema_version": "1",
+  "source_artifacts": {
+    "benchmark_driver": {
+      "path": "benchmarks/inference/vllm_benchmark.py",
+      "sha256": "0f32ee2c21cdae9c17995a7ab985a52a47935df1f08b6701bd9d4157fd69a6d1"
+    },
+    "compose": {
+      "path": "compose.gpu.yaml",
+      "sha256": "b6dcd59fe33ebe4ebccdab086869096ddbefecea6254d39e27fd7eb63ae8937e"
+    },
+    "config": {
+      "path": "benchmarks/inference/configs-rtx4080-super.yaml",
+      "sha256": "b07bc3b8aa72e25e717ead5f8c28fef6c0d9569add94e9f6730a5ebe73a24825"
+    },
+    "orchestrator": {
+      "path": "benchmarks/inference/run_local_gpu.py",
+      "sha256": "6073faba63ae5be83d66784eb8d0d2eec7be7b9595c5a7f32f8cb84be647b917"
+    },
+    "prompts": {
+      "path": "benchmarks/inference/prompts.json",
+      "sha256": "f2c72984759087ff06c62fd7e1d762682b8ad30974feb9b929a27c2b65d95963"
+    },
+    "startup_script": {
+      "path": "scripts/start-vllm.sh",
+      "sha256": "1ae3bb0b0bd54a115a4c0d74235f4f24ceafa745e5271577c6fea007304eab39"
+    }
+  },
+  "workload": {
+    "concurrency": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "max_tokens": 128,
+    "prompt_semantics": "Five exact prompts repeat after warm-up; prefix-cache is a hot exact-prompt upper-bound, not a general traffic estimate.",
+    "requests_per_level": 20,
+    "runs_per_scenario": 3,
+    "scenario_count": 3,
+    "total_measured_requests": 900,
+    "warmup_requests_per_run": 5
+  }
+}

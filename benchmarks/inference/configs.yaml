@@ -1,0 +1,25 @@
+scenarios:
+  - name: baseline
+    engine_args:
+      enable_prefix_caching: false
+      max_model_len: 4096
+      max_num_batched_tokens: 4096
+      gpu_memory_utilization: 0.90
+  - name: prefix-cache
+    engine_args:
+      enable_prefix_caching: true
+      max_model_len: 4096
+      max_num_batched_tokens: 4096
+      gpu_memory_utilization: 0.90
+  - name: constrained-batch
+    engine_args:
+      enable_prefix_caching: false
+      max_model_len: 4096
+      max_num_batched_tokens: 128
+      gpu_memory_utilization: 0.90
+
+concurrency: [1, 4, 8, 16]
+requests_per_level: 20
+warmup_requests: 5
+max_tokens: 128
+runs_per_scenario: 3

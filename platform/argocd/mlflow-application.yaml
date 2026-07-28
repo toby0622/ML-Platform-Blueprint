@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mlflow
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: ml-platform
+  sources:
+    - repoURL: https://github.com/mlflow/mlflow.git
+      # Immutable commit behind the MLflow v3.14.0 release tag.
+      targetRevision: 86cd7f5a1dc25a1387ad07c87811bbc30f62951c
+      path: charts
+      helm:
+        releaseName: mlflow
+        valueFiles:
+          - $values/platform/mlflow/values-lab.yaml
+    - repoURL: https://github.com/toby0622/ML-Platform-Blueprint.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ml-platform-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

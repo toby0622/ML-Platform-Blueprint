@@ -1,0 +1,9 @@
+aws_region                    = "us-west-2"
+environment                   = "dev"
+cluster_name                  = "ml-platform"
+kubernetes_version            = "1.33"
+tenants                       = ["team-a", "team-b"]
+enable_gpu_nodes              = false
+enable_managed_metadata_store = false
+monthly_budget_usd            = 300
+budget_notification_email     = "owner@example.com"

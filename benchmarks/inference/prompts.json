@@ -1,0 +1,7 @@
+[
+  "Explain the difference between throughput and latency in two sentences.",
+  "List three reasons a Kubernetes pod can remain Pending.",
+  "What does a model registry track?",
+  "Summarize why continuous batching improves LLM serving throughput.",
+  "Give a concise rollback checklist for a bad model canary."
+]

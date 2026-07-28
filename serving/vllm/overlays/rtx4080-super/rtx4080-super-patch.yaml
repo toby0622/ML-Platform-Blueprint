@@ -1,0 +1,30 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: qwen-llm
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    model:
+      runtimeVersion: v0.17.0
+      args:
+        - --model_name=qwen2.5-1.5b-instruct
+        - --max_model_len=4096
+        - --gpu_memory_utilization=0.75
+        - --max_num_seqs=32
+        - --enable_prefix_caching
+      storageUri: hf://Qwen/Qwen2.5-1.5B-Instruct:989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+      resources:
+        requests:
+          cpu: "2"
+          memory: 6Gi
+          ephemeral-storage: 6Gi
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "4"
+          memory: 12Gi
+          ephemeral-storage: 12Gi
+          nvidia.com/gpu: "1"
+    nodeSelector:
+      ml-platform.io/accelerator: nvidia-ada-16gb

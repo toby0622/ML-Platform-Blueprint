@@ -1,0 +1,13 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata:
+  name: development
+value: 100
+description: Development and exploratory workloads
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata:
+  name: production
+value: 10000
+description: Time-sensitive production training and recovery workloads

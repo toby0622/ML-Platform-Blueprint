@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-budget
+  namespace: team-a
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 24Gi
+    requests.storage: 100Gi
+    requests.nvidia.com/gpu: "1"
+    limits.cpu: "16"
+    limits.memory: 48Gi
+    limits.nvidia.com/gpu: "1"
+    count/jobs.batch: "20"
+    pods: "40"
+    persistentvolumeclaims: "10"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: workload-defaults
+  namespace: team-a
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 250m
+        memory: 256Mi
+      default:
+        cpu: "2"
+        memory: 4Gi
+      max:
+        cpu: "8"
+        memory: 24Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-budget
+  namespace: team-b
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 24Gi
+    requests.storage: 100Gi
+    requests.nvidia.com/gpu: "1"
+    limits.cpu: "16"
+    limits.memory: 48Gi
+    limits.nvidia.com/gpu: "1"
+    count/jobs.batch: "20"
+    pods: "40"
+    persistentvolumeclaims: "10"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: workload-defaults
+  namespace: team-b
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 250m
+        memory: 256Mi
+      default:
+        cpu: "2"
+        memory: 4Gi
+      max:
+        cpu: "8"
+        memory: 24Gi

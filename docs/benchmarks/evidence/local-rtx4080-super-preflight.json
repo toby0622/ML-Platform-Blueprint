@@ -1,0 +1,53 @@
+{
+  "blocked_reasons": [],
+  "checks": {
+    "docker": {
+      "available": true,
+      "client_version": "Docker version 29.6.2, build dfc4efb",
+      "compose_available": true,
+      "compose_version": "Docker Compose version v5.3.1",
+      "daemon_reachable": true,
+      "default_runtime": "runc",
+      "docker_desktop_detected": true,
+      "gpu_capability_check": "static_only_no_container_started",
+      "gpu_runtime_route": "nvidia-runtime",
+      "linux_engine": true,
+      "nvidia_runtime_detected": true,
+      "operating_system": "Docker Desktop",
+      "os_type": "linux",
+      "runtimes": [
+        "io.containerd.runc.v2",
+        "nvidia",
+        "runc"
+      ],
+      "server_version": "29.6.2",
+      "supports_gpus_flag": true
+    },
+    "nvidia": {
+      "available": true,
+      "compatible_device_count": 1,
+      "devices": [
+        {
+          "compute_capability": 8.9,
+          "driver_version": "610.74",
+          "index": 0,
+          "memory_total_mib": 16376,
+          "name": "NVIDIA GeForce RTX 4080 SUPER"
+        }
+      ],
+      "minimum_compute_capability": 7.5,
+      "minimum_vram_mib": 12000,
+      "query_succeeded": true
+    },
+    "wsl": {
+      "applicable": true,
+      "available": true,
+      "status": "ready",
+      "version": "WSL \u7248\u672c\uff1a 2.2.4.0",
+      "wsl2_detected": true
+    }
+  },
+  "host_os": "Windows",
+  "ready": true,
+  "schema_version": 1
+}

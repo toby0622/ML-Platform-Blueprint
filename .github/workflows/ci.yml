@@ -1,0 +1,231 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python quality and lifecycle tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev,kfp,mlflow,otel]'
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Type check
+        run: mypy
+
+      - name: Static artifact validation
+        run: python scripts/validate_repository.py
+
+      - name: Compile Kubeflow Pipeline
+        env:
+          ML_PLATFORM_PIPELINE_IMAGE: ghcr.io/toby0622/ml-platform-blueprint-pipeline:${{ github.sha }}
+        run: python pipelines/training_pipeline/pipeline.py
+
+      - name: Test with coverage
+        run: pytest --cov --cov-report=term-missing --cov-report=xml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-and-pipeline-evidence
+          path: |
+            coverage.xml
+            pipeline.yaml
+          if-no-files-found: error
+          retention-days: 14
+
+  helm-and-kustomize:
+    name: Helm and Kustomize validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.18.3
+
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: v1.34.0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: mlflow/mlflow
+          ref: 86cd7f5a1dc25a1387ad07c87811bbc30f62951c
+          path: .upstream/mlflow
+          sparse-checkout: charts
+
+      - name: Helm lint and render
+        run: |
+          helm lint platform/helm/ml-platform
+          helm template ml-platform platform/helm/ml-platform \
+            --namespace ml-platform-system \
+            --set serviceMonitor.enabled=false > rendered-chart.yaml
+
+      - name: Validate MLflow values against the pinned official chart
+        run: |
+          helm lint .upstream/mlflow/charts -f platform/mlflow/values-lab.yaml
+          helm template mlflow .upstream/mlflow/charts \
+            --namespace ml-platform-system \
+            -f platform/mlflow/values-lab.yaml > rendered-mlflow.yaml
+          helm lint .upstream/mlflow/charts -f platform/mlflow/values-production.yaml
+          helm template mlflow-production .upstream/mlflow/charts \
+            --namespace ml-platform-system \
+            -f platform/mlflow/values-production.yaml > rendered-mlflow-production.yaml
+
+      - name: Render first-party Kustomize resources
+        run: |
+          kubectl kustomize platform/tenants > rendered-tenants.yaml
+          kubectl kustomize platform/kueue > rendered-kueue.yaml
+          kubectl kustomize platform/policies > rendered-policies.yaml
+          kubectl kustomize platform/policies/production > rendered-policies-production.yaml
+          kubectl kustomize platform/argocd > rendered-argocd.yaml
+          kubectl kustomize observability/opentelemetry > rendered-opentelemetry.yaml
+          kubectl kustomize serving/kserve/predictive/base > rendered-serving.yaml
+          kubectl kustomize serving/kserve/predictive/overlays/canary > rendered-canary.yaml
+          kubectl kustomize serving/vllm/overlays/rtx4080-super > rendered-vllm-rtx4080-super.yaml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rendered-kubernetes-manifests
+          path: rendered-*.yaml
+          retention-days: 14
+
+  terraform:
+    name: Terraform format and validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: infra/terraform/aws
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Initialize without remote backend
+        run: terraform init -backend=false
+
+      - name: Validate
+        run: terraform validate
+
+  container:
+    name: Container build and vulnerability scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Validate Compose model
+        run: |
+          docker compose config --quiet
+          docker compose --file compose.gpu.yaml config --quiet
+
+      - name: Validate Prometheus configuration and rules
+        run: |
+          docker run --rm \
+            -v "$PWD/observability/prometheus:/etc/prometheus:ro" \
+            prom/prometheus:v3.4.1 \
+            promtool check config /etc/prometheus/prometheus.yml
+
+      - name: Build control-plane image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          tags: ml-platform-blueprint:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build pipeline image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.pipeline
+          push: false
+          load: true
+          tags: ml-platform-blueprint-pipeline:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build production MLflow image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/images/mlflow/Dockerfile
+          push: false
+          load: true
+          tags: ml-platform-blueprint-mlflow:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test image
+        run: |
+          docker run --rm ml-platform-blueprint:test \
+            --state-dir /tmp/state --tenant team-a --model churn init
+          docker run --rm ml-platform-blueprint-pipeline:test \
+            validate --samples 100 --data-seed 42 \
+            --output /tmp/dataset.npz --metadata /tmp/metadata.json
+          docker run --rm --entrypoint python ml-platform-blueprint-mlflow:test \
+            -c "import boto3, mlflow, psycopg2"
+
+      - name: Scan control-plane image
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: ml-platform-blueprint:test
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Scan pipeline image
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: ml-platform-blueprint-pipeline:test
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Scan production MLflow image
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: ml-platform-blueprint-mlflow:test
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

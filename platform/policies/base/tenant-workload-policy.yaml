@@ -1,0 +1,70 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: tenant-workload-baseline
+  annotations:
+    policies.kyverno.io/title: Tenant workload baseline
+    policies.kyverno.io/category: ML Platform Security
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-resources
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchLabels:
+                  ml-platform.io/tenant: "true"
+      validate:
+        message: Every container must define CPU and memory requests and limits.
+        foreach:
+          - list: request.object.spec.[initContainers, containers][]
+            pattern:
+              resources:
+                requests:
+                  cpu: "?*"
+                  memory: "?*"
+                limits:
+                  cpu: "?*"
+                  memory: "?*"
+    - name: require-hardened-container
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchLabels:
+                  ml-platform.io/tenant: "true"
+      validate:
+        message: Tenant containers must disable privilege escalation and drop capabilities.
+        foreach:
+          - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+            pattern:
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+    - name: block-host-access
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchLabels:
+                  ml-platform.io/tenant: "true"
+      validate:
+        message: Host namespaces, hostPath, and privileged containers are forbidden.
+        pattern:
+          spec:
+            =(hostNetwork): false
+            =(hostPID): false
+            =(hostIPC): false
+            =(volumes):
+              - X(hostPath): "null"
+            containers:
+              - =(securityContext):
+                  =(privileged): false

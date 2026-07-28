@@ -1,0 +1,9 @@
+- op: add
+  path: /spec/predictor/canaryTrafficPercent
+  value: 10
+- op: replace
+  path: /spec/predictor/containers/0/args/5
+  value: "2"
+- op: replace
+  path: /spec/predictor/storageUris/0/uri
+  value: s3://REPLACE_WITH_ARTIFACT_BUCKET/tenants/team-a/models/churn-classifier/2

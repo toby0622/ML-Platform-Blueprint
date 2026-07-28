@@ -1,0 +1,12 @@
+apiVersion: v2
+name: ml-platform
+description: Reference control plane for the ML Platform Blueprint
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+kubeVersion: ">=1.29.0-0"
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial control-plane chart

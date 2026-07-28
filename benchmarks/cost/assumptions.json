@@ -1,0 +1,7 @@
+{
+  "average_output_tokens_per_request": 128,
+  "gpu_hourly_cost_usd": 1.0,
+  "output_tokens_per_second": 50,
+  "replicas": 1,
+  "target_utilization": 0.7
+}

@@ -1,0 +1,102 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: cpu-default
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: gpu-a10
+spec:
+  nodeLabels:
+    ml-platform.io/accelerator: nvidia-a10
+  nodeTaints:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      value: present
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: Cohort
+metadata:
+  name: ai-teams
+spec:
+  fairSharing:
+    weight: "1"
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: team-a
+spec:
+  cohortName: ai-teams
+  namespaceSelector:
+    matchLabels:
+      ml-platform.io/tenant-name: team-a
+  queueingStrategy: BestEffortFIFO
+  fairSharing:
+    weight: "1"
+  preemption:
+    reclaimWithinCohort: Any
+    withinClusterQueue: LowerPriority
+  resourceGroups:
+    - coveredResources: [cpu, memory, pods]
+      flavors:
+        - name: cpu-default
+          resources:
+            - {name: cpu, nominalQuota: "8", borrowingLimit: "4"}
+            - {name: memory, nominalQuota: 24Gi, borrowingLimit: 12Gi}
+            - {name: pods, nominalQuota: "20", borrowingLimit: "10"}
+    - coveredResources: [nvidia.com/gpu]
+      flavors:
+        - name: gpu-a10
+          resources:
+            - {name: nvidia.com/gpu, nominalQuota: "1", borrowingLimit: "1"}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: team-b
+spec:
+  cohortName: ai-teams
+  namespaceSelector:
+    matchLabels:
+      ml-platform.io/tenant-name: team-b
+  queueingStrategy: BestEffortFIFO
+  fairSharing:
+    weight: "1"
+  preemption:
+    reclaimWithinCohort: Any
+    withinClusterQueue: LowerPriority
+  resourceGroups:
+    - coveredResources: [cpu, memory, pods]
+      flavors:
+        - name: cpu-default
+          resources:
+            - {name: cpu, nominalQuota: "8", borrowingLimit: "4"}
+            - {name: memory, nominalQuota: 24Gi, borrowingLimit: 12Gi}
+            - {name: pods, nominalQuota: "20", borrowingLimit: "10"}
+    - coveredResources: [nvidia.com/gpu]
+      flavors:
+        - name: gpu-a10
+          resources:
+            - {name: nvidia.com/gpu, nominalQuota: "1", borrowingLimit: "1"}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: default
+  namespace: team-a
+spec:
+  clusterQueue: team-a
+  fairSharing:
+    weight: "1"
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: default
+  namespace: team-b
+spec:
+  clusterQueue: team-b
+  fairSharing:
+    weight: "1"

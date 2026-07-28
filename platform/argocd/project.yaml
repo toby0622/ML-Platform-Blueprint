@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ml-platform
+  namespace: argocd
+spec:
+  description: ML Platform Blueprint first-party resources
+  sourceRepos:
+    - https://github.com/toby0622/ML-Platform-Blueprint.git
+    - https://github.com/mlflow/mlflow.git
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  orphanedResources:
+    warn: true

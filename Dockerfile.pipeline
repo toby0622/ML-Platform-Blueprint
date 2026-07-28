@@ -1,0 +1,17 @@
+# syntax=docker/dockerfile:1.7
+FROM python:3.12-slim-bookworm
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /opt/platform
+COPY pyproject.toml README.md ./
+COPY src ./src
+RUN python -m pip install --upgrade pip \
+    && python -m pip install '.[mlflow]' \
+    && useradd --uid 65532 --no-create-home --shell /usr/sbin/nologin pipeline
+
+USER 65532:65532
+ENTRYPOINT ["python", "-m", "ml_platform_blueprint.pipeline_components"]

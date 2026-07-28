@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible platform defect
+title: "[bug] "
+labels: [bug, triage]
+body:
+  - type: textarea
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Include commands, sanitized logs, version, and environment.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Impact and rollback
+      description: Which tenants or lifecycle stage are affected, and is a workaround available?
+    validations:
+      required: true

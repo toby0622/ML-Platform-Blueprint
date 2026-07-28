@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml
+configMapGenerator:
+  - name: otel-collector
+    namespace: observability
+    files:
+      - config.yaml=collector-config.yaml
+generatorOptions:
+  disableNameSuffixHash: true

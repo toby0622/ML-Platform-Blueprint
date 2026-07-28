@@ -1,0 +1,4 @@
+scenario,replicas,gpu_type,target_utilization,output_tokens_per_second,avg_output_tokens_per_request,notes
+baseline,1,A10G,0.70,REPLACE_AFTER_BENCHMARK,128,Single-zone lab estimate
+ha,2,A10G,0.60,REPLACE_AFTER_BENCHMARK,128,One replica can fail without total outage
+peak,4,A10G,0.70,REPLACE_AFTER_BENCHMARK,128,Validate queueing and quota first

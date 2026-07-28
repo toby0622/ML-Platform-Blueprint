@@ -1,0 +1,53 @@
+name: ml-platform-blueprint-gpu
+
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.23.0@sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f
+    entrypoint: ["/bin/sh", "/opt/ml-platform/start-vllm.sh"]
+    environment:
+      HF_HUB_DISABLE_XET: ${HF_HUB_DISABLE_XET:-1}
+      HF_XET_FIXED_DOWNLOAD_CONCURRENCY: ${HF_XET_FIXED_DOWNLOAD_CONCURRENCY:-8}
+      HF_TOKEN: ${HF_TOKEN:-}
+      VLLM_MODEL: ${VLLM_MODEL:-Qwen/Qwen2.5-1.5B-Instruct}
+      VLLM_MODEL_REVISION: ${VLLM_MODEL_REVISION-989aa7980e4cf806f80c7fef2b1adb7bc71aa306}
+      VLLM_SERVED_MODEL_NAME: ${VLLM_SERVED_MODEL_NAME:-qwen2.5-1.5b-instruct}
+      VLLM_DTYPE: ${VLLM_DTYPE:-auto}
+      VLLM_QUANTIZATION: ${VLLM_QUANTIZATION:-}
+      VLLM_MAX_MODEL_LEN: ${VLLM_MAX_MODEL_LEN:-4096}
+      VLLM_GPU_MEMORY_UTILIZATION: ${VLLM_GPU_MEMORY_UTILIZATION:-0.75}
+      VLLM_MAX_NUM_SEQS: ${VLLM_MAX_NUM_SEQS:-32}
+      VLLM_MAX_NUM_BATCHED_TOKENS: ${VLLM_MAX_NUM_BATCHED_TOKENS:-}
+      VLLM_ENABLE_PREFIX_CACHING: ${VLLM_ENABLE_PREFIX_CACHING:-false}
+      VLLM_ENABLE_CHUNKED_PREFILL: ${VLLM_ENABLE_CHUNKED_PREFILL:-true}
+      VLLM_KV_CACHE_DTYPE: ${VLLM_KV_CACHE_DTYPE:-auto}
+      VLLM_NO_USAGE_STATS: "1"
+    ports:
+      - "127.0.0.1:${VLLM_PORT:-8000}:8000"
+    ipc: host
+    volumes:
+      - ./scripts/start-vllm.sh:/opt/ml-platform/start-vllm.sh:ro
+      - huggingface-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 60
+      start_period: 180s
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:

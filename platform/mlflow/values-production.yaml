@@ -1,0 +1,57 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/toby0622/ml-platform-blueprint-mlflow
+  tag: 0.1.0
+  pullPolicy: IfNotPresent
+
+mlflow:
+  backendStoreUriFrom:
+    secretKeyRef:
+      name: mlflow-db-secret
+      key: uri
+  artifactsDestination: s3://REPLACE_WITH_ARTIFACT_BUCKET/mlflow
+
+server:
+  flag_options:
+    - enable_workspaces
+  value_options:
+    allowed_hosts: mlflow.example.com
+
+env:
+  - name: AWS_REGION
+    value: us-west-2
+
+serviceAccount:
+  create: true
+  name: mlflow
+
+metrics:
+  enabled: true
+  path: /metrics
+
+serviceMonitor:
+  enabled: true
+
+networkPolicy:
+  enabled: true
+  additionalEgressRules:
+    - to:
+        - ipBlock:
+            cidr: 169.254.170.23/32
+      ports:
+        - protocol: TCP
+          port: 80
+
+garbageCollection:
+  enabled: true
+  schedule: "0 2 * * 0"
+  allWorkspaces: true
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 4Gi

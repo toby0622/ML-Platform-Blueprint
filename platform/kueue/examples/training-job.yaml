@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: churn-training-
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: development
+    ml-platform.io/workload: training
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        ml-platform.io/workload: training
+    spec:
+      restartPolicy: Never
+      serviceAccountName: ml-developer
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: training
+          image: ghcr.io/toby0622/ml-platform-blueprint:0.1.0
+          args:
+            - --state-dir
+            - /workspace/state
+            - --tenant
+            - team-a
+            - --model
+            - churn-classifier
+            - train
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          volumeMounts:
+            - {name: workspace, mountPath: /workspace}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi

@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ml-platform-resources
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: tenants
+            path: platform/tenants
+            namespace: default
+            wave: "0"
+          - name: kueue-config
+            path: platform/kueue
+            namespace: default
+            wave: "1"
+          - name: policies
+            path: platform/policies
+            namespace: default
+            wave: "2"
+          - name: otel-collector
+            path: observability/opentelemetry
+            namespace: observability
+            wave: "3"
+  template:
+    metadata:
+      name: "ml-platform-{{name}}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{wave}}"
+    spec:
+      project: ml-platform
+      source:
+        repoURL: https://github.com/toby0622/ML-Platform-Blueprint.git
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - PruneLast=true
+      revisionHistoryLimit: 5

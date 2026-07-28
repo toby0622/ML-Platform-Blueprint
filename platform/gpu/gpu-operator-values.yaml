@@ -1,0 +1,32 @@
+operator:
+  defaultRuntime: containerd
+  use_ocp_driver_toolkit: false
+
+driver:
+  enabled: true
+
+toolkit:
+  enabled: true
+
+devicePlugin:
+  enabled: true
+  config:
+    name: device-plugin-config
+    default: exclusive
+
+gfd:
+  enabled: true
+
+dcgmExporter:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    additionalLabels:
+      release: kube-prometheus-stack
+
+migManager:
+  enabled: false
+
+nodeStatusExporter:
+  enabled: true

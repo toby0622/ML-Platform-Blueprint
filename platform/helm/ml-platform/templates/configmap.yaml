@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ml-platform.fullname" . }}
+  labels:
+    {{- include "ml-platform.labels" . | nindent 4 }}
+data:
+  ML_PLATFORM_TENANTS: {{ .Values.config.allowedTenants | quote }}
+  ML_PLATFORM_ENVIRONMENT: {{ .Values.config.environment | quote }}
+  ML_PLATFORM_CODE_REVISION: {{ .Values.config.codeRevision | quote }}
+  MLFLOW_TRACKING_URI: {{ .Values.config.mlflowTrackingUri | quote }}
+  MLFLOW_EXPERIMENT_NAME: {{ .Values.config.mlflowExperiment | quote }}
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: {{ .Values.config.otelTracesEndpoint | quote }}
+  OTEL_SERVICE_NAME: {{ .Values.config.otelServiceName | quote }}
+  ML_PLATFORM_STATE_DIR: /var/lib/ml-platform

@@ -1,0 +1,50 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-ml-platform-images
+  annotations:
+    policies.kyverno.io/title: Verify ML platform images
+    policies.kyverno.io/category: Software Supply Chain
+    policies.kyverno.io/severity: critical
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  rules:
+    - name: require-image-digest
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchLabels:
+                  ml-platform.io/tenant: "true"
+      validate:
+        message: Production tenant images must be pinned by SHA-256 digest.
+        foreach:
+          - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+            deny:
+              conditions:
+                all:
+                  - key: "{{ contains(element.image, '@sha256:') }}"
+                    operator: Equals
+                    value: false
+    - name: verify-keyless-signature
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchLabels:
+                  ml-platform.io/tenant: "true"
+      verifyImages:
+        - imageReferences:
+            - ghcr.io/toby0622/ml-platform-blueprint*
+          mutateDigest: true
+          verifyDigest: true
+          required: true
+          attestors:
+            - entries:
+                - keyless:
+                    subject: https://github.com/toby0622/ML-Platform-Blueprint/.github/workflows/release.yml@refs/tags/*
+                    issuer: https://token.actions.githubusercontent.com

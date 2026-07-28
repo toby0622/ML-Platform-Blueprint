@@ -1,0 +1,10 @@
+ML Platform control plane is installed.
+
+Check readiness:
+  kubectl -n {{ .Release.Namespace }} get deploy {{ include "ml-platform.fullname" . }}
+
+Port-forward the API:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "ml-platform.fullname" . }} 8080:{{ .Values.service.port }}
+
+OpenAPI:
+  http://127.0.0.1:8080/docs

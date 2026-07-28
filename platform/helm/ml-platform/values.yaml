@@ -1,0 +1,114 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/toby0622/ml-platform-blueprint
+  tag: "0.1.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: false
+  annotations: {}
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: /metrics
+
+podLabels:
+  app.kubernetes.io/part-of: ml-platform
+  ml-platform.io/plane: control
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: ml-platform.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+persistence:
+  enabled: true
+  accessModes: [ReadWriteOnce]
+  size: 5Gi
+  storageClass: ""
+  annotations: {}
+
+config:
+  allowedTenants: team-a,team-b
+  environment: kubernetes
+  codeRevision: set-by-gitops
+  mlflowTrackingUri: http://mlflow.ml-platform-system.svc.cluster.local:5000
+  mlflowExperiment: ml-platform-blueprint
+  otelTracesEndpoint: http://otel-collector.observability.svc.cluster.local:4318/v1/traces
+  otelServiceName: ml-platform-control-plane
+
+probes:
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 3
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 6
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels:
+    release: kube-prometheus-stack
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
+  prometheusNamespaceLabel:
+    kubernetes.io/metadata.name: monitoring
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
