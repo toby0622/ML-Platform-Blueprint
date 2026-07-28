@@ -3,8 +3,8 @@
 ## Executive summary
 
 The CPU reference plane completed 1,000 local prediction requests with 100%
-availability at concurrency 32. Observed throughput was 749.53 requests/second,
-with p50 39.05 ms, p95 55.27 ms, and p99 82.56 ms client-observed latency.
+availability at concurrency 32. Observed throughput was 743.74 requests/second,
+with p50 37.95 ms, p95 58.51 ms, and p99 126.49 ms client-observed latency.
 
 This is a development baseline, not a production capacity claim. It measures one
 Uvicorn process, a NumPy model, and a local SQLite registry on one Windows
@@ -40,7 +40,7 @@ secret-free GPU evidence is
 | Timeout | 10 seconds |
 | Warm-up | No separate warm-up phase |
 
-The code was an uncommitted working tree based on revision `3666abdd2fd0`.
+The code was an uncommitted working tree based on revision `785da3446cd9`.
 Because a commit did not yet identify the complete tree, the evidence records
 SHA-256 hashes for the benchmark and critical serving files.
 
@@ -51,18 +51,18 @@ SHA-256 hashes for the benchmark and critical serving files.
 | Successful requests | 1,000 / 1,000 |
 | Availability | 100% |
 | Error rate | 0% |
-| Elapsed time | 1.3342 s |
-| Throughput | 749.53 requests/s |
-| Mean latency | 39.91 ms |
-| p50 latency | 39.05 ms |
-| p95 latency | 55.27 ms |
-| p99 latency | 82.56 ms |
-| Maximum latency | 124.50 ms |
+| Elapsed time | 1.3445 s |
+| Throughput | 743.74 requests/s |
+| Mean latency | 40.59 ms |
+| p50 latency | 37.95 ms |
+| p95 latency | 58.51 ms |
+| p99 latency | 126.49 ms |
+| Maximum latency | 151.26 ms |
 
 All responses were HTTP 200, used the `stable` route, and named model version 1.
 The raw 1,000-sample local output had SHA-256
-`c0801429d608d50dc4e500c391bdbb81d825c11375f8dd4c8a339afa95630dbb`
-and remains in the ignored `benchmark-results/final-local-cpu-load-otel.json`
+`2f89cea679fa05f5b562f5ff17cec9635ee708a24fd74e2fa6dffc4073b1c688`
+and remains in the ignored `benchmark-results/portal-dashboard-cpu-load.json`
 workspace file. Every request carried a stable `X-Request-Id`; the compact
 reviewed evidence records the benchmark and complete serving/tracing source
 hashes.
@@ -70,15 +70,15 @@ hashes.
 ## Reproduction
 
 ```bash
-ml-platform --state-dir benchmark-results/final-state-otel-20260728 \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
   --tenant team-a --model churn-classifier train
 
-ml-platform --state-dir benchmark-results/final-state-otel-20260728 \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
   --tenant team-a --model churn-classifier promote \
   --version 1 --actor benchmark \
-  --reason "local CPU benchmark after OpenTelemetry integration"
+  --reason "Portal dashboard discovery API validation"
 
-ml-platform --state-dir benchmark-results/final-state-otel-20260728 \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
   --tenant team-a --model churn-classifier serve \
   --host 127.0.0.1 --port 18080 --no-access-log
 
@@ -87,7 +87,7 @@ python benchmarks/load/run.py \
   --tenant team-a --model churn-classifier \
   --requests 1000 --concurrency 32 --timeout 10 \
   --max-error-rate 0 \
-  --output benchmark-results/final-local-cpu-load-otel.json
+  --output benchmark-results/portal-dashboard-cpu-load.json
 ```
 
 Run at least three repetitions with a warm-up and background-noise controls

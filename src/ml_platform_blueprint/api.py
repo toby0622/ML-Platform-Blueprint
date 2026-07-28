@@ -167,6 +167,72 @@ def create_app(
             media_type="text/plain; version=0.0.4; charset=utf-8",
         )
 
+    @application.get("/v1/tenants", tags=["catalog"])
+    def list_tenants() -> dict[str, Any]:
+        return {"items": [{"name": tenant} for tenant in selected_settings.allowed_tenants]}
+
+    @application.get("/v1/tenants/{tenant}/overview", tags=["catalog"])
+    def tenant_overview(
+        tenant: str,
+        x_tenant_id: Annotated[str | None, Header()] = None,
+    ) -> dict[str, Any]:
+        verify_tenant_header(tenant, x_tenant_id)
+        models = selected_service.registry.list_models(tenant)
+        recent_runs = selected_service.registry.list_runs(tenant, limit=8)
+        return {
+            "tenant": tenant,
+            "environment": selected_settings.environment,
+            "summary": {
+                "models": len(models),
+                "versions": sum(int(model["version_count"]) for model in models),
+                "active_canaries": sum(
+                    1
+                    for model in models
+                    if model["deployment"] is not None
+                    and model["deployment"]["canary_version"] is not None
+                ),
+                "recent_runs": len(recent_runs),
+            },
+            "models": models,
+            "recent_runs": recent_runs,
+        }
+
+    @application.get("/v1/tenants/{tenant}/models", tags=["catalog"])
+    def list_models(
+        tenant: str,
+        x_tenant_id: Annotated[str | None, Header()] = None,
+    ) -> dict[str, Any]:
+        verify_tenant_header(tenant, x_tenant_id)
+        return {"items": selected_service.registry.list_models(tenant)}
+
+    @application.get("/v1/tenants/{tenant}/runs", tags=["training"])
+    def list_runs(
+        tenant: str,
+        model_name: str | None = None,
+        limit: Annotated[int, Query(ge=1, le=500)] = 100,
+        x_tenant_id: Annotated[str | None, Header()] = None,
+    ) -> dict[str, Any]:
+        verify_tenant_header(tenant, x_tenant_id)
+        return {
+            "items": selected_service.registry.list_runs(
+                tenant,
+                model_name=model_name,
+                limit=limit,
+            )
+        }
+
+    @application.get("/v1/tenants/{tenant}/runs/{run_id}", tags=["training"])
+    def get_tenant_run(
+        tenant: str,
+        run_id: str,
+        x_tenant_id: Annotated[str | None, Header()] = None,
+    ) -> dict[str, Any]:
+        verify_tenant_header(tenant, x_tenant_id)
+        run = selected_service.registry.get_run(run_id)
+        if run["tenant"] != tenant:
+            raise NotFoundError(f"run {run_id!r} does not exist for tenant {tenant!r}")
+        return run
+
     @application.post(
         "/v1/tenants/{tenant}/models/{model_name}/runs",
         status_code=201,
@@ -247,6 +313,25 @@ def create_app(
     ) -> dict[str, Any]:
         verify_tenant_header(tenant, x_tenant_id)
         return selected_service.registry.get_deployment(tenant, model_name).to_dict()
+
+    @application.get(
+        "/v1/tenants/{tenant}/models/{model_name}/deployment/history",
+        tags=["deployment"],
+    )
+    def deployment_history(
+        tenant: str,
+        model_name: str,
+        limit: Annotated[int, Query(ge=1, le=500)] = 100,
+        x_tenant_id: Annotated[str | None, Header()] = None,
+    ) -> dict[str, Any]:
+        verify_tenant_header(tenant, x_tenant_id)
+        return {
+            "items": selected_service.registry.list_deployment_history(
+                tenant,
+                model_name,
+                limit,
+            )
+        }
 
     @application.post(
         "/v1/tenants/{tenant}/models/{model_name}/deployment/finalize",

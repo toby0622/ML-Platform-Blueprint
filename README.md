@@ -28,6 +28,7 @@ The repository has two deliberately connected layers.
 
 | Layer | Purpose | Runtime |
 |---|---|---|
+| Portal | Unified command center for models, runs, deployments, inference, audit, and reviewed GPU evidence | Next/React, server-side BFF |
 | Reference plane | Deterministic training, evaluation, immutable artifact registry, lineage, promotion policy, canary routing, rollback, audit, API, CLI, and metrics | Python, NumPy, SQLite |
 | Kubernetes blueprint | KFP, MLflow, KServe, Kueue, GPU Operator/DCGM, Prometheus/Grafana/OTel, Kyverno, Argo CD, tenant isolation, and AWS IaC | Kubernetes and optional AWS/GPU |
 
@@ -39,7 +40,9 @@ it is not a disconnected collection of YAML.
 
 ```mermaid
 flowchart TB
-  User["Developer / Data Scientist"] --> Git["Git repository"]
+  User["Developer / Data Scientist"] --> Portal["ML Platform Portal"]
+  User --> Git["Git repository"]
+  Portal --> API
   Git --> CI["CI: test · build · scan · attest · sign"]
   CI --> Registry["OCI registry"]
   Registry --> Argo["Argo CD / GitOps"]
@@ -73,6 +76,25 @@ flowchart TB
 See [the detailed architecture](docs/architecture/architecture.md), the
 [threat model](docs/architecture/threat-model.md), and the
 [decision records](docs/adr/).
+
+## Portal Dashboard
+
+The primary local entry point is now the ML Platform Command Center rather than
+an API endpoint. It provides Demo and Live modes, model/run discovery,
+policy-gated deployment actions, predictive and GPU inference playgrounds,
+observability drill-through, audit context, and reviewed RTX 4080 SUPER
+evidence.
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build --detach
+docker compose exec platform-api ml-platform --tenant team-a --model churn-risk demo
+```
+
+Open [http://127.0.0.1:3001](http://127.0.0.1:3001), switch to **Live**, and
+select `team-a`. See the [complete Portal guide](docs/portal.md) for the
+role-based workflow, local frontend development, GPU chat, and the boundary
+between public Demo data and local live state.
 
 ## Five-minute local lifecycle
 
@@ -136,6 +158,7 @@ docker compose ps
 
 | Endpoint | URL |
 |---|---|
+| ML Platform Portal | http://localhost:3001 |
 | Platform API | http://localhost:8080/docs |
 | MLflow | http://localhost:5000 |
 | MinIO console | http://localhost:9001 |
@@ -235,6 +258,7 @@ result. A failed online gate atomically removes canary traffic.
 src/ml_platform_blueprint/    runnable control and serving plane
 pipelines/                    typed Kubeflow Pipeline
 platform/                     Helm, Argo CD, Kueue, tenancy, policy, GPU
+portal/                       Portal Dashboard, BFF routes, and container
 serving/                      KServe predictive and vLLM manifests
 infra/                        kind and AWS Terraform
 observability/                Prometheus, Grafana, OpenTelemetry

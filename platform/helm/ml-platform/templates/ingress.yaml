@@ -27,9 +27,15 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
+                {{- if $.Values.portal.enabled }}
+                name: {{ include "ml-platform.portalFullname" $ }}
+                port:
+                  name: http
+                {{- else }}
                 name: {{ include "ml-platform.fullname" $ }}
                 port:
                   name: http
+                {{- end }}
           {{- end }}
     {{- end }}
 {{- end }}

@@ -18,11 +18,17 @@ jobs:
       matrix:
         include:
           - name: ml-platform-blueprint
+            context: .
             dockerfile: Dockerfile
           - name: ml-platform-blueprint-pipeline
+            context: .
             dockerfile: Dockerfile.pipeline
           - name: ml-platform-blueprint-mlflow
+            context: .
             dockerfile: infra/images/mlflow/Dockerfile
+          - name: ml-platform-blueprint-portal
+            context: ./portal
+            dockerfile: portal/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +51,7 @@ jobs:
       - id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.metadata.outputs.tags }}

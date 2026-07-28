@@ -2,6 +2,7 @@
 
 ## Design
 
+- [Portal Dashboard usage](portal.md)
 - [Architecture](architecture/architecture.md)
 - [Threat model](architecture/threat-model.md)
 - [Architecture decision records](adr/)

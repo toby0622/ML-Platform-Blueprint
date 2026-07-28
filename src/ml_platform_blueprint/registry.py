@@ -215,11 +215,8 @@ class Registry:
                 (error[:2000], utc_now(), run_id),
             )
 
-    def get_run(self, run_id: str) -> dict[str, Any]:
-        with self._connect() as connection:
-            row = connection.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
-        if row is None:
-            raise NotFoundError(f"run {run_id!r} does not exist")
+    @staticmethod
+    def _row_to_run(row: sqlite3.Row) -> dict[str, Any]:
         return {
             "run_id": row["run_id"],
             "tenant": row["tenant"],
@@ -233,6 +230,34 @@ class Registry:
             "started_at": row["started_at"],
             "ended_at": row["ended_at"],
         }
+
+    def get_run(self, run_id: str) -> dict[str, Any]:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+        if row is None:
+            raise NotFoundError(f"run {run_id!r} does not exist")
+        return self._row_to_run(row)
+
+    def list_runs(
+        self,
+        tenant: str,
+        *,
+        model_name: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        validate_resource_name(tenant, "tenant")
+        bounded_limit = max(1, min(limit, 500))
+        query = "SELECT * FROM runs WHERE tenant = ?"
+        parameters: list[str | int] = [tenant]
+        if model_name is not None:
+            validate_resource_name(model_name, "model_name")
+            query += " AND model_name = ?"
+            parameters.append(model_name)
+        query += " ORDER BY started_at DESC LIMIT ?"
+        parameters.append(bounded_limit)
+        with self._connect() as connection:
+            rows = connection.execute(query, parameters).fetchall()
+        return [self._row_to_run(row) for row in rows]
 
     @staticmethod
     def _model_card(
@@ -461,6 +486,86 @@ customer decisions.
                 (tenant, model_name),
             ).fetchall()
         return [self._row_to_version(row) for row in rows]
+
+    def list_models(self, tenant: str) -> list[dict[str, Any]]:
+        validate_resource_name(tenant, "tenant")
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                WITH version_counts AS (
+                    SELECT tenant, model_name, COUNT(*) AS version_count
+                    FROM model_versions
+                    WHERE tenant = ?
+                    GROUP BY tenant, model_name
+                )
+                SELECT
+                    models.tenant,
+                    models.name,
+                    models.created_at,
+                    COALESCE(version_counts.version_count, 0) AS version_count,
+                    latest.version AS latest_version,
+                    latest.stage AS latest_stage,
+                    latest.metrics_json AS latest_metrics_json,
+                    deployments.stable_version,
+                    deployments.canary_version,
+                    deployments.canary_weight,
+                    deployments.updated_at AS deployment_updated_at
+                FROM models
+                LEFT JOIN version_counts
+                    ON version_counts.tenant = models.tenant
+                    AND version_counts.model_name = models.name
+                LEFT JOIN model_versions AS latest
+                    ON latest.tenant = models.tenant
+                    AND latest.model_name = models.name
+                    AND latest.version = (
+                        SELECT MAX(candidate.version)
+                        FROM model_versions AS candidate
+                        WHERE candidate.tenant = models.tenant
+                        AND candidate.model_name = models.name
+                    )
+                LEFT JOIN deployments
+                    ON deployments.tenant = models.tenant
+                    AND deployments.model_name = models.name
+                WHERE models.tenant = ?
+                ORDER BY models.name
+                """,
+                (tenant, tenant),
+            ).fetchall()
+
+        items: list[dict[str, Any]] = []
+        for row in rows:
+            deployment = None
+            if row["stable_version"] is not None:
+                deployment = {
+                    "stable_version": int(row["stable_version"]),
+                    "canary_version": (
+                        int(row["canary_version"]) if row["canary_version"] is not None else None
+                    ),
+                    "canary_weight": int(row["canary_weight"]),
+                    "updated_at": row["deployment_updated_at"],
+                }
+            items.append(
+                {
+                    "tenant": row["tenant"],
+                    "name": row["name"],
+                    "created_at": row["created_at"],
+                    "version_count": int(row["version_count"]),
+                    "latest_version": (
+                        int(row["latest_version"]) if row["latest_version"] is not None else None
+                    ),
+                    "latest_stage": row["latest_stage"],
+                    "latest_metrics": (
+                        {
+                            key: float(value)
+                            for key, value in json.loads(row["latest_metrics_json"]).items()
+                        }
+                        if row["latest_metrics_json"]
+                        else None
+                    ),
+                    "deployment": deployment,
+                }
+            )
+        return items
 
     def load_artifact(self, tenant: str, model_name: str, version: int) -> ModelArtifact:
         record = self.get_version(tenant, model_name, version)

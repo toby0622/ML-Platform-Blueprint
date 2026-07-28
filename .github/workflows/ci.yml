@@ -14,6 +14,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  portal:
+    name: Portal lint, typecheck, render, and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.20.0"
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install Portal dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build and server-render test
+        run: npm test
+
   python:
     name: Python quality and lifecycle tests
     runs-on: ubuntu-24.04
@@ -193,6 +221,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build Portal image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./portal
+          file: ./portal/Dockerfile
+          push: false
+          load: true
+          tags: ml-platform-blueprint-portal:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Smoke-test image
         run: |
           docker run --rm ml-platform-blueprint:test \
@@ -225,6 +264,15 @@ jobs:
         uses: aquasecurity/trivy-action@0.31.0
         with:
           image-ref: ml-platform-blueprint-mlflow:test
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Scan Portal image
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: ml-platform-blueprint-portal:test
           format: table
           severity: CRITICAL,HIGH
           ignore-unfixed: true

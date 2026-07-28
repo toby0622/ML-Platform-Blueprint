@@ -1,0 +1,80 @@
+{{- if .Values.portal.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ml-platform.portalFullname" . }}
+  labels:
+    {{- include "ml-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: portal
+spec:
+  replicas: {{ .Values.portal.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ml-platform.portalSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ml-platform.portalSelectorLabels" . | nindent 8 }}
+        app.kubernetes.io/part-of: ml-platform
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: portal
+          image: {{ include "ml-platform.portalImage" . | quote }}
+          imagePullPolicy: {{ .Values.portal.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: PLATFORM_API_URL
+              value: {{ printf "http://%s:%v" (include "ml-platform.fullname" .) .Values.service.port | quote }}
+            - name: VLLM_API_URL
+              value: {{ .Values.portal.vllmApiUrl | quote }}
+            - name: VLLM_SERVED_MODEL_NAME
+              value: {{ .Values.portal.servedModelName | quote }}
+            - name: WRANGLER_WRITE_LOGS
+              value: "false"
+            - name: WRANGLER_LOG_PATH
+              value: /tmp/wrangler.log
+            - name: MINIFLARE_REGISTRY_PATH
+              value: /tmp/miniflare-registry
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          resources:
+            {{- toYaml .Values.portal.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+{{- end }}

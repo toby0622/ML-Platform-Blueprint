@@ -1,0 +1,18 @@
+{{- if .Values.portal.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ml-platform.portalFullname" . }}
+  labels:
+    {{- include "ml-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: portal
+spec:
+  type: {{ .Values.portal.service.type }}
+  selector:
+    {{- include "ml-platform.portalSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.portal.service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

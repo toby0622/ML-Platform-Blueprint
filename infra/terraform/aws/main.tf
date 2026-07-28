@@ -249,7 +249,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
 }
 
 resource "aws_ecr_repository" "images" {
-  for_each = toset(["control-plane", "pipeline", "model-server", "mlflow"])
+  for_each = toset(["control-plane", "pipeline", "model-server", "mlflow", "portal"])
 
   name                 = "${local.name}/${each.key}"
   image_tag_mutability = "IMMUTABLE"

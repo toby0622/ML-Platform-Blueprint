@@ -60,6 +60,35 @@ def test_production_mlflow_image_is_built_and_released() -> None:
     assert "psycopg2-binary" in dockerfile
 
 
+def test_portal_is_built_released_and_wired_through_the_server_side_bff() -> None:
+    compose = yaml.safe_load(Path("compose.yaml").read_text(encoding="utf-8"))
+    portal = compose["services"]["portal"]
+    assert portal["ports"] == ["127.0.0.1:${PORTAL_PORT:-3001}:3000"]
+    assert portal["environment"]["PLATFORM_API_URL"] == "http://platform-api:8080"
+    assert "NEXT_PUBLIC" not in json.dumps(portal)
+    assert {"control", "portal-egress"} == set(portal["networks"])
+
+    workflow = yaml.safe_load(Path(".github/workflows/release.yml").read_text(encoding="utf-8"))
+    matrix = workflow["jobs"]["publish"]["strategy"]["matrix"]["include"]
+    portal_build = next(
+        entry for entry in matrix if entry["name"] == "ml-platform-blueprint-portal"
+    )
+    assert portal_build == {
+        "name": "ml-platform-blueprint-portal",
+        "context": "./portal",
+        "dockerfile": "portal/Dockerfile",
+    }
+
+    values = yaml.safe_load(
+        Path("platform/helm/ml-platform/values.yaml").read_text(encoding="utf-8")
+    )
+    assert values["portal"]["enabled"] is True
+    assert values["portal"]["image"]["repository"].endswith("ml-platform-blueprint-portal")
+    assert Path("portal/app/api/platform/[...path]/route.ts").is_file()
+    assert Path("portal/app/api/llm/chat/route.ts").is_file()
+    assert Path("portal/public/og.png").stat().st_size > 100_000
+
+
 def test_pod_identity_and_artifact_egress_are_explicit() -> None:
     policies = list(
         yaml.safe_load_all(

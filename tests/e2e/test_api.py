@@ -109,6 +109,28 @@ def test_api_exposes_lineage_finalize_rollback_and_structured_errors(
         ).json()
         run_id = baseline["run_id"]
         assert client.get(f"/v1/runs/{run_id}").json()["status"] == "succeeded"
+        assert client.get("/v1/tenants").json()["items"] == [
+            {"name": "team-a"},
+            {"name": "team-b"},
+        ]
+        tenant_run = client.get(f"/v1/tenants/team-a/runs/{run_id}", headers=headers)
+        assert tenant_run.status_code == 200
+        assert tenant_run.json()["tenant"] == "team-a"
+        runs = client.get("/v1/tenants/team-a/runs?model_name=churn", headers=headers)
+        assert runs.status_code == 200
+        assert [item["run_id"] for item in runs.json()["items"]] == [run_id]
+        models = client.get("/v1/tenants/team-a/models", headers=headers)
+        assert models.status_code == 200
+        assert models.json()["items"][0]["name"] == "churn"
+        assert models.json()["items"][0]["version_count"] == 1
+        overview = client.get("/v1/tenants/team-a/overview", headers=headers)
+        assert overview.status_code == 200
+        assert overview.json()["summary"] == {
+            "models": 1,
+            "versions": 1,
+            "active_canaries": 0,
+            "recent_runs": 1,
+        }
         assert (
             client.get("/v1/tenants/team-a/models/churn/versions", headers=headers).json()["items"][
                 0
@@ -177,6 +199,12 @@ def test_api_exposes_lineage_finalize_rollback_and_structured_errors(
         audit = client.get("/v1/tenants/team-a/models/churn/audit?limit=10", headers=headers)
         assert audit.status_code == 200
         assert audit.json()["items"][0]["event_type"] == "manual_rollback"
+        history = client.get(
+            "/v1/tenants/team-a/models/churn/deployment/history?limit=10",
+            headers=headers,
+        )
+        assert history.status_code == 200
+        assert history.json()["items"][0]["action"] == "manual_rollback"
 
         invalid_name = client.post(
             "/v1/tenants/team-a/models/Not-Valid/runs",

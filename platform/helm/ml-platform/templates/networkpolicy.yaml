@@ -11,6 +11,15 @@ spec:
       {{- include "ml-platform.selectorLabels" . | nindent 6 }}
   policyTypes: [Ingress, Egress]
   ingress:
+    {{- if .Values.portal.enabled }}
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "ml-platform.portalSelectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 8080
+    {{- end }}
     - from:
         - namespaceSelector:
             matchLabels:

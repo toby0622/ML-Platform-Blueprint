@@ -8,6 +8,12 @@ semantic versioning.
 
 ### Added
 
+- Unified ML Platform Command Center with explicit Demo and Live modes.
+- Server-side Portal BFF for the Platform API and bounded local vLLM chat.
+- Tenant overview, model/run discovery, tenant-scoped run, and deployment
+  history endpoints.
+- Docker Compose Portal service, role-based usage guide, and bespoke social
+  preview asset.
 - Deterministic synthetic-data training and evaluation lifecycle.
 - Immutable JSON model artifacts, checksums, model cards, lineage, and audit.
 - Offline quality gates, stable/canary routing, online gates, and rollback.

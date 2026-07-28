@@ -9,5 +9,12 @@ benchmark-results
 dist
 docs
 tests
+**/node_modules
+portal/.next
+portal/.vinext
+portal/.wrangler
+portal/dist
+portal/outputs
+portal/work
 *.pyc
 __pycache__

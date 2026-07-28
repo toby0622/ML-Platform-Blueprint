@@ -42,3 +42,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ printf "%s:%s" .Values.image.repository (.Values.image.tag | default .Chart.AppVersion) }}
 {{- end -}}
 {{- end }}
+
+{{- define "ml-platform.portalFullname" -}}
+{{ printf "%s-portal" (include "ml-platform.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{- define "ml-platform.portalSelectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-portal" (include "ml-platform.name" .) | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: portal
+{{- end }}
+
+{{- define "ml-platform.portalImage" -}}
+{{- if .Values.portal.image.digest -}}
+{{ printf "%s@%s" .Values.portal.image.repository .Values.portal.image.digest }}
+{{- else -}}
+{{ printf "%s:%s" .Values.portal.image.repository (.Values.portal.image.tag | default .Chart.AppVersion) }}
+{{- end -}}
+{{- end }}

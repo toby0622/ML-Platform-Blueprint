@@ -45,6 +45,27 @@ service:
   type: ClusterIP
   port: 8080
 
+portal:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: ghcr.io/toby0622/ml-platform-blueprint-portal
+    tag: "0.1.0"
+    digest: ""
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  vllmApiUrl: http://vllm-predictor.ml-platform-system.svc.cluster.local:80
+  servedModelName: qwen2.5-1.5b-instruct
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 ingress:
   enabled: false
   className: ""

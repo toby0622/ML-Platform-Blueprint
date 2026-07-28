@@ -17,14 +17,18 @@ IGNORED_PARTS = {
     ".demo",
     ".git",
     ".mypy_cache",
+    ".next",
     ".pytest_cache",
     ".ruff_cache",
     ".terraform",
     ".tools",
     ".venv",
+    ".vinext",
+    ".wrangler",
     "__pycache__",
     "benchmark-results",
     "dist",
+    "node_modules",
 }
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 

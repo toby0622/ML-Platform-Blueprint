@@ -122,6 +122,29 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
 
+  portal:
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    environment:
+      PLATFORM_API_URL: http://platform-api:8080
+      VLLM_API_URL: ${PORTAL_VLLM_API_URL:-http://host.docker.internal:8000}
+      VLLM_SERVED_MODEL_NAME: ${VLLM_SERVED_MODEL_NAME:-qwen2.5-1.5b-instruct}
+    depends_on:
+      platform-api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${PORTAL_PORT:-3001}:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [control, portal-egress]
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
   otel-collector:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.157.0
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
@@ -179,6 +202,7 @@ networks:
   artifacts:
     internal: true
   observability: {}
+  portal-egress: {}
 
 volumes:
   postgres-data:
