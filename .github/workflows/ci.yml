@@ -49,7 +49,7 @@ jobs:
       - name: Test with coverage
         run: pytest --cov --cov-report=term-missing --cov-report=xml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: test-and-pipeline-evidence
           path: |
@@ -110,7 +110,7 @@ jobs:
           kubectl kustomize serving/kserve/predictive/overlays/canary > rendered-canary.yaml
           kubectl kustomize serving/vllm/overlays/rtx4080-super > rendered-vllm-rtx4080-super.yaml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: rendered-kubernetes-manifests
           path: rendered-*.yaml
