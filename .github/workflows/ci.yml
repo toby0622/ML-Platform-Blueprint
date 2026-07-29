@@ -190,7 +190,7 @@ jobs:
             check config /etc/prometheus/prometheus.yml
 
       - name: Build control-plane image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile
@@ -201,7 +201,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build pipeline image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile.pipeline
@@ -212,7 +212,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build production MLflow image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: infra/images/mlflow/Dockerfile
@@ -223,7 +223,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build Portal image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./portal
           file: ./portal/Dockerfile
