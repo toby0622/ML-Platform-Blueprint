@@ -33,6 +33,25 @@ IGNORED_PARTS = {
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
+def _sha256_candidates(path: Path, *, allow_text_newline_variants: bool) -> set[str]:
+    """Return exact and, for text sources, LF/CRLF-equivalent SHA-256 hashes."""
+
+    payload = path.read_bytes()
+    candidates = {hashlib.sha256(payload).hexdigest()}
+    if not allow_text_newline_variants:
+        return candidates
+
+    try:
+        payload.decode("utf-8")
+    except UnicodeDecodeError:
+        return candidates
+
+    lf_payload = payload.replace(b"\r\n", b"\n")
+    candidates.add(hashlib.sha256(lf_payload).hexdigest())
+    candidates.add(hashlib.sha256(lf_payload.replace(b"\n", b"\r\n")).hexdigest())
+    return candidates
+
+
 def _is_ignored(path: Path) -> bool:
     return path.name == "pipeline.yaml" or any(
         part in IGNORED_PARTS for part in path.relative_to(ROOT).parts
@@ -174,7 +193,13 @@ def validate_benchmark_evidence() -> list[str]:
     evidence = json.loads(cpu_evidence_path.read_text(encoding="utf-8"))
     errors: list[str] = []
 
-    def verify(relative_path: str, expected_hash: str, *, required: bool) -> None:
+    def verify(
+        relative_path: str,
+        expected_hash: str,
+        *,
+        required: bool,
+        allow_text_newline_variants: bool = False,
+    ) -> None:
         target = (ROOT / relative_path).resolve()
         try:
             target.relative_to(ROOT)
@@ -185,8 +210,12 @@ def validate_benchmark_evidence() -> list[str]:
             if required:
                 errors.append(f"benchmark evidence target does not exist: {relative_path}")
             return
-        observed_hash = hashlib.sha256(target.read_bytes()).hexdigest()
-        if observed_hash != expected_hash.lower():
+        candidate_hashes = _sha256_candidates(
+            target,
+            allow_text_newline_variants=allow_text_newline_variants,
+        )
+        if expected_hash.lower() not in candidate_hashes:
+            observed_hash = hashlib.sha256(target.read_bytes()).hexdigest()
             errors.append(
                 f"benchmark evidence hash mismatch for {relative_path}: "
                 f"expected {expected_hash.lower()}, observed {observed_hash}"
@@ -197,9 +226,15 @@ def validate_benchmark_evidence() -> list[str]:
         "benchmarks/load/run.py",
         str(source.get("benchmark_sha256", "")),
         required=True,
+        allow_text_newline_variants=True,
     )
     for relative_path, expected_hash in source.get("critical_file_sha256", {}).items():
-        verify(str(relative_path), str(expected_hash), required=True)
+        verify(
+            str(relative_path),
+            str(expected_hash),
+            required=True,
+            allow_text_newline_variants=True,
+        )
 
     artifact = evidence.get("artifact", {})
     # Raw samples are intentionally gitignored; validate them when present locally.
@@ -246,12 +281,14 @@ def validate_benchmark_evidence() -> list[str]:
             str(source_artifact.get("path", "")),
             str(source_artifact.get("sha256", "")),
             required=True,
+            allow_text_newline_variants=True,
         )
     preflight_artifact = gpu_evidence.get("preflight_artifact", {})
     verify(
         str(preflight_artifact.get("path", "")),
         str(preflight_artifact.get("sha256", "")),
         required=True,
+        allow_text_newline_variants=True,
     )
     return errors
 

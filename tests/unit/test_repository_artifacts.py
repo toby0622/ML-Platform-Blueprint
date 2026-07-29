@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import sys
@@ -17,6 +18,43 @@ def test_repository_artifacts_are_valid() -> None:
     spec.loader.exec_module(module)
 
     assert module.main() == 0
+
+
+def test_source_hash_validation_accepts_only_newline_encoding_changes(
+    tmp_path: Path,
+) -> None:
+    path = Path("scripts/validate_repository.py").resolve()
+    spec = importlib.util.spec_from_file_location("validate_repository", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["validate_repository"] = module
+    spec.loader.exec_module(module)
+
+    source = tmp_path / "source.py"
+    lf_payload = b"first = 1\nsecond = 2\n"
+    source.write_bytes(lf_payload)
+    crlf_hash = hashlib.sha256(lf_payload.replace(b"\n", b"\r\n")).hexdigest()
+
+    assert crlf_hash in module._sha256_candidates(
+        source,
+        allow_text_newline_variants=True,
+    )
+    assert crlf_hash not in module._sha256_candidates(
+        source,
+        allow_text_newline_variants=False,
+    )
+    assert hashlib.sha256(b"first = 1\nsecond = 3\n").hexdigest() not in (
+        module._sha256_candidates(
+            source,
+            allow_text_newline_variants=True,
+        )
+    )
+    assert hashlib.sha256(lf_payload.replace(b"\n", b"\r")).hexdigest() not in (
+        module._sha256_candidates(
+            source,
+            allow_text_newline_variants=True,
+        )
+    )
 
 
 def test_kserve_custom_runtime_uses_the_v017_storage_contract() -> None:
