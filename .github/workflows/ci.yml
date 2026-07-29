@@ -243,7 +243,7 @@ jobs:
             -c "import boto3, mlflow, psycopg2"
 
       - name: Scan control-plane image
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ml-platform-blueprint:test
           format: table
@@ -252,7 +252,7 @@ jobs:
           exit-code: "1"
 
       - name: Scan pipeline image
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ml-platform-blueprint-pipeline:test
           format: table
@@ -261,7 +261,7 @@ jobs:
           exit-code: "1"
 
       - name: Scan production MLflow image
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ml-platform-blueprint-mlflow:test
           format: table
@@ -270,7 +270,7 @@ jobs:
           exit-code: "1"
 
       - name: Scan Portal image
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ml-platform-blueprint-portal:test
           format: table

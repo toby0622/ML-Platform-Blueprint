@@ -12,7 +12,7 @@ license = { text = "Apache-2.0" }
 authors = [{ name = "ML Platform Blueprint contributors" }]
 dependencies = [
   "fastapi>=0.115,<1",
-  "numpy>=2.0,<3",
+  "numpy>=2.0,<2.5",
   "pydantic>=2.10,<3",
   "uvicorn>=0.34,<1",
 ]
