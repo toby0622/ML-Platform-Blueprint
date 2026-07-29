@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22.20.0"
+          node-version: "22.23.1"
           cache: npm
           cache-dependency-path: portal/package-lock.json
 
@@ -242,6 +242,41 @@ jobs:
             --output /tmp/dataset.npz --metadata /tmp/metadata.json
           docker run --rm --entrypoint python ml-platform-blueprint-mlflow:test \
             -c "import boto3, mlflow, psycopg2"
+          docker run --detach --name portal-smoke \
+            --publish 127.0.0.1:3000:3000 \
+            ml-platform-blueprint-portal:test
+          trap 'docker rm --force portal-smoke >/dev/null 2>&1 || true' EXIT
+          portal_ready=false
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then
+              portal_ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$portal_ready" != true ]; then
+            docker logs portal-smoke
+            exit 1
+          fi
+          portal_html="$(curl --fail --silent --show-error http://127.0.0.1:3000/)"
+          asset_path="$(
+            printf '%s' "$portal_html" |
+              grep --only-matching --extended-regexp 'href="/[^"]+\.css"' |
+              sed --quiet '1{s/^href="//;s/"$//;p;}'
+          )"
+          test -n "$asset_path"
+          curl --fail --silent --show-error \
+            "http://127.0.0.1:3000${asset_path}" >/dev/null
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3000/og.png >/dev/null
+          llm_status="$(
+            curl --silent --output /tmp/portal-llm-status.json \
+              --write-out '%{http_code}' \
+              http://127.0.0.1:3000/api/llm/status
+          )"
+          test "$llm_status" = 503
+          grep --quiet '"code":"llm_backend_not_configured"' \
+            /tmp/portal-llm-status.json
 
       - name: Scan control-plane image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
