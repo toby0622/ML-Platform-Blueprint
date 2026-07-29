@@ -9,8 +9,18 @@ from ml_platform_blueprint.api import create_app
 from ml_platform_blueprint.config import Settings
 
 
+class RecordingSpanExporter(InMemorySpanExporter):
+    def __init__(self) -> None:
+        super().__init__()
+        self.shutdown_calls = 0
+
+    def shutdown(self) -> None:
+        self.shutdown_calls += 1
+        super().shutdown()
+
+
 def test_fastapi_exports_otlp_spans_and_excludes_health_endpoints(tmp_path: Path) -> None:
-    exporter = InMemorySpanExporter()
+    exporter = RecordingSpanExporter()
     application = create_app(
         Settings(
             state_dir=tmp_path,
@@ -32,6 +42,7 @@ def test_fastapi_exports_otlp_spans_and_excludes_health_endpoints(tmp_path: Path
     assert server_spans[0].attributes["http.route"] == "/"
     assert server_spans[0].resource.attributes["service.name"] == "trace-test-service"
     assert server_spans[0].resource.attributes["deployment.environment.name"] == "test"
+    assert exporter.shutdown_calls == 1
 
 
 def test_general_otlp_endpoint_is_normalized_for_traces(

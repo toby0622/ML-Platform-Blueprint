@@ -3,8 +3,8 @@
 ## Executive summary
 
 The CPU reference plane completed 1,000 local prediction requests with 100%
-availability at concurrency 32. Observed throughput was 743.74 requests/second,
-with p50 37.95 ms, p95 58.51 ms, and p99 126.49 ms client-observed latency.
+availability at concurrency 32. Observed throughput was 585.25 requests/second,
+with p50 52.78 ms, p95 70.39 ms, and p99 81.90 ms client-observed latency.
 
 This is a development baseline, not a production capacity claim. It measures one
 Uvicorn process, a NumPy model, and a local SQLite registry on one Windows
@@ -27,7 +27,7 @@ secret-free GPU evidence is
 
 | Dimension | Value |
 |---|---|
-| Date | 2026-07-28 |
+| Date | 2026-07-29 |
 | Host OS | Windows 11 build 26200, AMD64 |
 | CPU | AMD Ryzen 9 9950X, 16 cores / 32 logical processors |
 | Python | 3.13.11 |
@@ -40,7 +40,7 @@ secret-free GPU evidence is
 | Timeout | 10 seconds |
 | Warm-up | No separate warm-up phase |
 
-The code was an uncommitted working tree based on revision `785da3446cd9`.
+The code was an uncommitted working tree based on revision `9bbd962f9bab`.
 Because a commit did not yet identify the complete tree, the evidence records
 SHA-256 hashes for the benchmark and critical serving files.
 
@@ -51,34 +51,34 @@ SHA-256 hashes for the benchmark and critical serving files.
 | Successful requests | 1,000 / 1,000 |
 | Availability | 100% |
 | Error rate | 0% |
-| Elapsed time | 1.3445 s |
-| Throughput | 743.74 requests/s |
-| Mean latency | 40.59 ms |
-| p50 latency | 37.95 ms |
-| p95 latency | 58.51 ms |
-| p99 latency | 126.49 ms |
-| Maximum latency | 151.26 ms |
+| Elapsed time | 1.7087 s |
+| Throughput | 585.25 requests/s |
+| Mean latency | 52.12 ms |
+| p50 latency | 52.78 ms |
+| p95 latency | 70.39 ms |
+| p99 latency | 81.90 ms |
+| Maximum latency | 126.49 ms |
 
 All responses were HTTP 200, used the `stable` route, and named model version 1.
 The raw 1,000-sample local output had SHA-256
-`2f89cea679fa05f5b562f5ff17cec9635ee708a24fd74e2fa6dffc4073b1c688`
-and remains in the ignored `benchmark-results/portal-dashboard-cpu-load.json`
-workspace file. Every request carried a stable `X-Request-Id`; the compact
-reviewed evidence records the benchmark and complete serving/tracing source
-hashes.
+`c6397e210deb74dfe42e5483aa21c2221f6f9bd756b5eb88d32ab6de300c28ac`
+and remains in the ignored
+`benchmark-results/portal-dashboard-cpu-load-lifespan-20260729.json` workspace
+file. Every request carried a stable `X-Request-Id`; the compact reviewed
+evidence records the benchmark and complete serving/tracing source hashes.
 
 ## Reproduction
 
 ```bash
-ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark-20260729-lifespan \
   --tenant team-a --model churn-classifier train
 
-ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark-20260729-lifespan \
   --tenant team-a --model churn-classifier promote \
   --version 1 --actor benchmark \
-  --reason "Portal dashboard discovery API validation"
+  --reason "Tracing lifespan compatibility validation"
 
-ml-platform --state-dir .ml-platform/portal-cpu-benchmark \
+ml-platform --state-dir .ml-platform/portal-cpu-benchmark-20260729-lifespan \
   --tenant team-a --model churn-classifier serve \
   --host 127.0.0.1 --port 18080 --no-access-log
 
@@ -87,7 +87,7 @@ python benchmarks/load/run.py \
   --tenant team-a --model churn-classifier \
   --requests 1000 --concurrency 32 --timeout 10 \
   --max-error-rate 0 \
-  --output benchmark-results/portal-dashboard-cpu-load.json
+  --output benchmark-results/portal-dashboard-cpu-load-lifespan-20260729.json
 ```
 
 Run at least three repetitions with a warm-up and background-noise controls

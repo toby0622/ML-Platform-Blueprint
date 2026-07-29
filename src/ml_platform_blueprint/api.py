@@ -20,7 +20,7 @@ from .domain import (
     ValidationError,
 )
 from .service import PlatformService, TrainingParameters
-from .tracing import configure_tracing
+from .tracing import configure_tracing, tracing_lifespan
 from .utils import InvalidResourceName
 
 
@@ -93,6 +93,7 @@ def create_app(
             "Self-service training, lineage, promotion, canary, rollback, and "
             "reference inference plane."
         ),
+        lifespan=tracing_lifespan,
     )
     application.state.service = selected_service
 

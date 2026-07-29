@@ -184,9 +184,10 @@ jobs:
       - name: Validate Prometheus configuration and rules
         run: |
           docker run --rm \
+            --entrypoint /bin/promtool \
             -v "$PWD/observability/prometheus:/etc/prometheus:ro" \
             prom/prometheus:v3.4.1 \
-            promtool check config /etc/prometheus/prometheus.yml
+            check config /etc/prometheus/prometheus.yml
 
       - name: Build control-plane image
         uses: docker/build-push-action@v6

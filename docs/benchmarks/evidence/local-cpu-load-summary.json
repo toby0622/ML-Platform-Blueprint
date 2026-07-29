@@ -1,7 +1,7 @@
 {
   "artifact": {
-    "raw_output_path": "benchmark-results/portal-dashboard-cpu-load.json",
-    "raw_output_sha256": "2f89cea679fa05f5b562f5ff17cec9635ee708a24fd74e2fa6dffc4073b1c688"
+    "raw_output_path": "benchmark-results/portal-dashboard-cpu-load-lifespan-20260729.json",
+    "raw_output_sha256": "c6397e210deb74dfe42e5483aa21c2221f6f9bd756b5eb88d32ab6de300c28ac"
   },
   "configuration": {
     "concurrency": 32,
@@ -19,15 +19,15 @@
   },
   "result": {
     "availability": 1.0,
-    "elapsed_seconds": 1.3445490000303835,
+    "elapsed_seconds": 1.7086665999377146,
     "error_rate": 0.0,
     "failed_requests": 0,
     "latency_ms": {
-      "max": 151.25769999576733,
-      "mean": 40.58549220015993,
-      "p50": 37.945549993310124,
-      "p95": 58.50775003782473,
-      "p99": 126.4909489935962
+      "max": 126.49050005711615,
+      "mean": 52.12348320125602,
+      "p50": 52.77820001356304,
+      "p95": 70.3942000051029,
+      "p99": 81.89885198022239
     },
     "routes": {
       "stable": 1000
@@ -36,28 +36,28 @@
       "200": 1000
     },
     "successful_requests": 1000,
-    "throughput_rps": 743.743812964349,
+    "throughput_rps": 585.251681069,
     "versions": {
       "1": 1000
     }
   },
   "schema_version": "1",
   "source": {
-    "base_revision": "785da3446cd9",
+    "base_revision": "9bbd962f9bab",
     "benchmark_sha256": "0a576796d180831c4489c55244742794500011a17b2129f5cc63a3fd2ee0da50",
     "critical_file_sha256": {
-      "src/ml_platform_blueprint/api.py": "4092881061767c3456dec2315abb92fa86e5714228f6595491081900d511fe7f",
+      "src/ml_platform_blueprint/api.py": "daa6ed4d887f6cba1190dab4e09d81bdf6b9133d3a9d145327c0c1acf46512ad",
       "src/ml_platform_blueprint/cli.py": "74d8811b7eac03624f23dc5bbafafc497cb497c6057b86458f031d10d4331aee",
       "src/ml_platform_blueprint/config.py": "e78517eacd8691cdfd0ce83932916fe32f69bd52d45a38a9dffa3cc4f04a1301",
       "src/ml_platform_blueprint/model.py": "7033b1a7830a00c7678db9e2f7de1739aaee405ca35bafa04ea9315a0144d393",
       "src/ml_platform_blueprint/registry.py": "b323b50f196fc43f077201b21760bb4d5de9e7779460cacb773a38ea67d7b383",
       "src/ml_platform_blueprint/service.py": "b07ec3c4600be7a83324815b917bb8268452b64142cf0556a8126ad48d92a184",
       "src/ml_platform_blueprint/telemetry.py": "5be1cac08f1c40be46a038d57bb69d1a26ae8d9550f23ad834f530f689f1865b",
-      "src/ml_platform_blueprint/tracing.py": "8ddd3f341190781e106a587bdb4293544601a00435375afa988d45762623ba9c",
+      "src/ml_platform_blueprint/tracing.py": "ab753de9962e429d695383cb0567815e4e2276ed18721b9c0fe5b28224ef2894",
       "src/ml_platform_blueprint/tracking.py": "5b297b3f88b0606e4ca8d3becf9d8154a3bd3f76af783e22ed657a46911ad37d"
     },
     "working_tree_dirty": true
   },
-  "test_date": "2026-07-28",
+  "test_date": "2026-07-29",
   "warning": "Single-machine development baseline only; not a Kubernetes, GPU, high-availability, or production capacity result."
 }

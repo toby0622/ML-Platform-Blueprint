@@ -2,11 +2,32 @@
 
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
 from .config import Settings
+
+
+class _TracerProvider(Protocol):
+    def shutdown(self) -> None: ...
+
+
+@asynccontextmanager
+async def tracing_lifespan(application: FastAPI) -> AsyncIterator[None]:
+    """Shut down the configured tracing provider with the ASGI application."""
+
+    try:
+        yield
+    finally:
+        provider = cast(
+            _TracerProvider | None,
+            getattr(application.state, "tracer_provider", None),
+        )
+        if provider is not None:
+            provider.shutdown()
 
 
 def configure_tracing(
@@ -14,7 +35,7 @@ def configure_tracing(
     settings: Settings,
     *,
     span_exporter: Any | None = None,
-) -> Any | None:
+) -> _TracerProvider | None:
     """Instrument an application when an OTLP traces endpoint is configured."""
 
     if settings.otel_traces_endpoint is None:
@@ -50,5 +71,4 @@ def configure_tracing(
         excluded_urls="healthz,readyz,metrics",
     )
     application.state.tracer_provider = provider
-    application.add_event_handler("shutdown", provider.shutdown)
     return provider
