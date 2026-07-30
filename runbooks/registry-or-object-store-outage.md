@@ -16,9 +16,9 @@ them until artifact availability is understood.
 2. Inspect dependency health without printing secrets:
 
    ```bash
-   kubectl -n mlflow get pod,svc,endpoints,pvc
-   kubectl -n mlflow get events --sort-by=.lastTimestamp
-   kubectl -n mlflow logs deploy/mlflow --since=30m
+   kubectl -n ml-platform-system get pod,svc,endpoints,pvc
+   kubectl -n ml-platform-system get events --sort-by=.lastTimestamp
+   kubectl -n ml-platform-system logs deploy/mlflow --since=30m
    ```
 
 3. Compare a failed URI with the registry metadata and expected SHA-256. Use a

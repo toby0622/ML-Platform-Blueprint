@@ -1,7 +1,7 @@
 {
   "artifact": {
-    "raw_output_path": "benchmark-results/portal-dashboard-cpu-load-lifespan-20260729.json",
-    "raw_output_sha256": "c6397e210deb74dfe42e5483aa21c2221f6f9bd756b5eb88d32ab6de300c28ac"
+    "raw_output_path": "benchmark-results/tutorial-cpu-load-20260730.json",
+    "raw_output_sha256": "28c4e39c6fb1a999603402f71dae16f0ca4f2853bee019e59097c7660d61477d"
   },
   "configuration": {
     "concurrency": 32,
@@ -19,15 +19,15 @@
   },
   "result": {
     "availability": 1.0,
-    "elapsed_seconds": 1.7086665999377146,
+    "elapsed_seconds": 1.7348298999713734,
     "error_rate": 0.0,
     "failed_requests": 0,
     "latency_ms": {
-      "max": 126.49050005711615,
-      "mean": 52.12348320125602,
-      "p50": 52.77820001356304,
-      "p95": 70.3942000051029,
-      "p99": 81.89885198022239
+      "max": 293.7962000723928,
+      "mean": 54.108285300433636,
+      "p50": 45.792800025083125,
+      "p95": 85.35167496884235,
+      "p99": 289.70929502276704
     },
     "routes": {
       "stable": 1000
@@ -36,18 +36,18 @@
       "200": 1000
     },
     "successful_requests": 1000,
-    "throughput_rps": 585.251681069,
+    "throughput_rps": 576.4253890346836,
     "versions": {
       "1": 1000
     }
   },
   "schema_version": "1",
   "source": {
-    "base_revision": "9bbd962f9bab",
+    "base_revision": "e5d9d71d5ba3",
     "benchmark_sha256": "0a576796d180831c4489c55244742794500011a17b2129f5cc63a3fd2ee0da50",
     "critical_file_sha256": {
       "src/ml_platform_blueprint/api.py": "daa6ed4d887f6cba1190dab4e09d81bdf6b9133d3a9d145327c0c1acf46512ad",
-      "src/ml_platform_blueprint/cli.py": "74d8811b7eac03624f23dc5bbafafc497cb497c6057b86458f031d10d4331aee",
+      "src/ml_platform_blueprint/cli.py": "db4623e3030d37af8d5ef48bc251cd3e471a57cee957ec686a8ea0707647e4a6",
       "src/ml_platform_blueprint/config.py": "e78517eacd8691cdfd0ce83932916fe32f69bd52d45a38a9dffa3cc4f04a1301",
       "src/ml_platform_blueprint/model.py": "7033b1a7830a00c7678db9e2f7de1739aaee405ca35bafa04ea9315a0144d393",
       "src/ml_platform_blueprint/registry.py": "b323b50f196fc43f077201b21760bb4d5de9e7779460cacb773a38ea67d7b383",
@@ -58,6 +58,6 @@
     },
     "working_tree_dirty": true
   },
-  "test_date": "2026-07-29",
+  "test_date": "2026-07-30",
   "warning": "Single-machine development baseline only; not a Kubernetes, GPU, high-availability, or production capacity result."
 }

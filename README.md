@@ -8,6 +8,10 @@ A production-style, multi-tenant ML platform reference implementation for
 Kubernetes. It demonstrates the complete lifecycle of a predictive model and
 provides an optional GPU/LLM serving path:
 
+> 繁體中文讀者可直接從
+> [ML Platform Blueprint 完整上手教學](docs/tutorial-zh-TW.md)開始，依序完成
+> 純 Python、Portal、Docker Compose、Kubernetes、GPU 與 AWS 路徑。
+
 ```text
 data validation -> train -> evaluate -> register -> quality gate
                 -> canary -> promote or rollback -> observe
@@ -318,6 +322,7 @@ signatures.
 
 ## Documentation
 
+- [繁體中文完整上手教學](docs/tutorial-zh-TW.md)
 - [Architecture](docs/architecture/architecture.md)
 - [Acceptance evidence](docs/acceptance-evidence.md)
 - [ADRs](docs/adr/)

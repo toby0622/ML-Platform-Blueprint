@@ -18,9 +18,9 @@ target environment produces an attached report.
 | Benchmarkable | deterministic request IDs, raw samples, p50/p95/p99, TTFT/ITL/token throughput, RTX scenario orchestration, GPU telemetry, cost calculator | benchmark unit tests; CPU baseline; RTX preflight, CUDA container, health/chat, 900-request vLLM evidence |
 | Explainable | architecture, threat model, ADRs, runbooks, postmortem, articles | required-evidence repository validation |
 
-Current local verification: 66 tests pass with 89.37% statement/branch coverage,
+Current local verification: 72 tests pass with 90.03% statement/branch coverage,
 strict mypy passes for all 17 package modules, Ruff passes, and the repository
-validator parses 54 YAML and 8 JSON evidence/configuration files. The KFP
+validator parses 54 YAML and 24 JSON evidence/configuration files. The KFP
 pipeline compiles, both first-party and official MLflow charts lint/render, all
 nine Kustomize targets render, and Terraform format/validate passes. Counts are
 expected to evolve; CI is the authoritative check.

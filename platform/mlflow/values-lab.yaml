@@ -1,3 +1,5 @@
+fullnameOverride: mlflow
+
 image:
   repository: ghcr.io/mlflow/mlflow
   tag: v3.14.0

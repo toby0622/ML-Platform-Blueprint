@@ -1,8 +1,13 @@
 # Documentation index
 
+## Start here
+
+- [繁體中文完整上手教學](tutorial-zh-TW.md)
+
 ## Design
 
 - [Portal Dashboard usage](portal.md)
+- [Local NVIDIA GPU and vLLM](local-gpu.md)
 - [Architecture](architecture/architecture.md)
 - [Threat model](architecture/threat-model.md)
 - [Architecture decision records](adr/)

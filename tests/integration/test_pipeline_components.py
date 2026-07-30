@@ -4,10 +4,84 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pytest
 from mlflow import MlflowClient
 
 from ml_platform_blueprint.pipeline_components import main
+
+
+def test_components_write_to_extensionless_artifact_paths(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    dataset = tmp_path / "dataset"
+    metadata = tmp_path / "dataset-metadata"
+    model = tmp_path / "model"
+    evaluation_data = tmp_path / "evaluation-data"
+    parameters = tmp_path / "parameters"
+
+    assert (
+        main(
+            [
+                "validate",
+                "--samples",
+                "100",
+                "--data-seed",
+                "42",
+                "--output",
+                str(dataset),
+                "--metadata",
+                str(metadata),
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+
+    assert dataset.is_file()
+    assert not dataset.with_suffix(".npz").exists()
+    with np.load(dataset, allow_pickle=False) as payload:
+        assert payload["features"].shape == (100, 6)
+        assert payload["labels"].shape == (100,)
+
+    assert (
+        main(
+            [
+                "train",
+                "--dataset",
+                str(dataset),
+                "--dataset-metadata",
+                str(metadata),
+                "--model",
+                str(model),
+                "--evaluation-data",
+                str(evaluation_data),
+                "--parameters",
+                str(parameters),
+                "--split-seed",
+                "42",
+                "--test-fraction",
+                "0.2",
+                "--learning-rate",
+                "0.12",
+                "--epochs",
+                "10",
+                "--l2",
+                "0.01",
+                "--decision-threshold",
+                "0.5",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+
+    assert evaluation_data.is_file()
+    assert not evaluation_data.with_suffix(".npz").exists()
+    with np.load(evaluation_data, allow_pickle=False) as payload:
+        assert payload["features"].shape == (20, 6)
+        assert payload["labels"].shape == (20,)
 
 
 def test_artifact_oriented_pipeline_components(

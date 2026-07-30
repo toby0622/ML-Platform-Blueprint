@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -21,14 +22,9 @@ def _print(value: Any) -> None:
 
 def _settings(args: argparse.Namespace) -> Settings:
     defaults = Settings.from_env()
-    return Settings(
-        state_dir=Path(args.state_dir),
-        allowed_tenants=defaults.allowed_tenants,
-        code_revision=defaults.code_revision,
-        mlflow_tracking_uri=defaults.mlflow_tracking_uri,
-        mlflow_experiment=defaults.mlflow_experiment,
-        environment=defaults.environment,
-    )
+    if args.state_dir is None:
+        return defaults
+    return replace(defaults, state_dir=Path(args.state_dir))
 
 
 def _training_parameters(args: argparse.Namespace) -> TrainingParameters:
@@ -125,8 +121,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--state-dir",
-        default=".ml-platform",
-        help="Registry and artifact state directory (default: .ml-platform)",
+        default=None,
+        help=(
+            "Registry and artifact state directory (default: ML_PLATFORM_STATE_DIR or .ml-platform)"
+        ),
     )
     parser.add_argument("--tenant", default="team-a")
     parser.add_argument("--model", default="churn-classifier")

@@ -36,6 +36,19 @@ semantic versioning.
 - Unit, integration, API, model-server, and repository validation tests.
 - ADRs, runbooks, threat model, demo, acceptance matrix, articles, roadmap, and
   synthetic postmortem.
+- End-to-end Traditional Chinese onboarding tutorial covering the local
+  lifecycle, API, Portal, Compose, Kubernetes, GPU, AWS, observability, and
+  honest runtime boundaries.
+
+### Fixed
+
+- CLI now honors `ML_PLATFORM_STATE_DIR` and preserves OpenTelemetry settings
+  when `--state-dir` is omitted, allowing read-only Compose and Helm containers
+  to use their mounted state volume.
+- KFP components now write NumPy archives to extensionless artifact paths
+  without silently creating an undeclared `.npz` sibling.
+- MLflow lab and production values now give the official chart a stable
+  `mlflow` service name that matches in-cluster DNS references.
 
 ## [0.1.0] - 2026-07-28
 

@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 import uvicorn
 
-from ml_platform_blueprint.cli import main
+from ml_platform_blueprint.cli import _settings, build_parser, main
 
 
 def invoke(
@@ -20,6 +20,45 @@ def invoke(
     captured = capsys.readouterr()
     assert result == expected, captured
     return json.loads(captured.out)
+
+
+def test_cli_settings_use_environment_state_dir_when_flag_is_omitted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    environment_state = tmp_path / "from-environment"
+    monkeypatch.setenv("ML_PLATFORM_STATE_DIR", str(environment_state))
+
+    settings = _settings(build_parser().parse_args(["init"]))
+
+    assert settings.state_dir == environment_state
+
+
+def test_cli_state_dir_flag_overrides_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    explicit_state = tmp_path / "explicit"
+    monkeypatch.setenv("ML_PLATFORM_STATE_DIR", str(tmp_path / "from-environment"))
+
+    settings = _settings(build_parser().parse_args(["--state-dir", str(explicit_state), "init"]))
+
+    assert settings.state_dir == explicit_state
+
+
+def test_cli_settings_preserve_otel_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(
+        "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+        "http://collector:4318/v1/traces",
+    )
+    monkeypatch.setenv("OTEL_SERVICE_NAME", "cli-test-service")
+
+    settings = _settings(build_parser().parse_args(["serve"]))
+
+    assert settings.otel_traces_endpoint == "http://collector:4318/v1/traces"
+    assert settings.otel_service_name == "cli-test-service"
 
 
 def test_cli_operates_complete_lifecycle(

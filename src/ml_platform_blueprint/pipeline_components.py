@@ -26,12 +26,13 @@ def validate_component(args: argparse.Namespace) -> dict[str, Any]:
     validate_dataset(dataset)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(
-        output,
-        features=dataset.features,
-        labels=dataset.labels,
-        feature_names=np.asarray(dataset.feature_names),
-    )
+    with output.open("wb") as handle:
+        np.savez_compressed(
+            handle,
+            features=dataset.features,
+            labels=dataset.labels,
+            feature_names=np.asarray(dataset.feature_names),
+        )
     metadata = dataset.metadata | {"sha256": dataset.checksum}
     atomic_write_text(Path(args.metadata), canonical_json(metadata) + "\n")
     return metadata
@@ -73,7 +74,8 @@ def train_component(args: argparse.Namespace) -> dict[str, Any]:
     atomic_write_text(Path(args.model), artifact.to_json())
     evaluation_path = Path(args.evaluation_data)
     evaluation_path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(evaluation_path, features=test_x, labels=test_y)
+    with evaluation_path.open("wb") as handle:
+        np.savez_compressed(handle, features=test_x, labels=test_y)
     parameters = {
         "samples": int(dataset.metadata["samples"]),
         "data_seed": int(dataset.metadata["seed"]),

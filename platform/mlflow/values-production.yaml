@@ -1,3 +1,5 @@
+fullnameOverride: mlflow
+
 replicaCount: 2
 
 image:
