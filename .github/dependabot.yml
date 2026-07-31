@@ -5,13 +5,32 @@ updates:
     schedule:
       interval: weekly
     groups:
-      python:
-        patterns: ["*"]
+      runtime:
+        patterns: ["fastapi", "numpy", "pydantic", "uvicorn"]
+        update-types: ["patch", "minor"]
+      development-tools:
+        patterns: ["hatchling", "httpx", "mypy", "pytest", "pytest-cov", "pyyaml", "ruff"]
+        update-types: ["patch", "minor"]
+      observability:
+        patterns: ["opentelemetry-*"]
+        update-types: ["patch", "minor"]
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Python minor upgrades are platform migrations and require a dedicated
+      # compatibility matrix; keep receiving rebuilds for the supported 3.12 tag.
+      - dependency-name: python
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
+        # Release attestations require a dedicated end-to-end validation path.
+        exclude-patterns: ["actions/attest-build-provenance"]

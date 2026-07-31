@@ -119,6 +119,54 @@ def test_python_runtime_images_enforce_known_security_floors() -> None:
     assert workflow.count("find_spec('pip') is None") == 4
 
 
+def test_dependabot_separates_routine_updates_from_platform_migrations() -> None:
+    config = yaml.safe_load(Path(".github/dependabot.yml").read_text(encoding="utf-8"))
+    updates = {entry["package-ecosystem"]: entry for entry in config["updates"]}
+
+    pip_groups = updates["pip"]["groups"]
+    assert pip_groups == {
+        "runtime": {
+            "patterns": ["fastapi", "numpy", "pydantic", "uvicorn"],
+            "update-types": ["patch", "minor"],
+        },
+        "development-tools": {
+            "patterns": [
+                "hatchling",
+                "httpx",
+                "mypy",
+                "pytest",
+                "pytest-cov",
+                "pyyaml",
+                "ruff",
+            ],
+            "update-types": ["patch", "minor"],
+        },
+        "observability": {
+            "patterns": ["opentelemetry-*"],
+            "update-types": ["patch", "minor"],
+        },
+    }
+    grouped_python_dependencies = {
+        dependency for group in pip_groups.values() for dependency in group["patterns"]
+    }
+    assert "*" not in grouped_python_dependencies
+    assert {"kfp", "mlflow"}.isdisjoint(grouped_python_dependencies)
+
+    python_ignore = next(
+        rule for rule in updates["docker"]["ignore"] if rule["dependency-name"] == "python"
+    )
+    assert set(python_ignore["update-types"]) == {
+        "version-update:semver-major",
+        "version-update:semver-minor",
+    }
+    assert updates["github-actions"]["groups"] == {
+        "github-actions": {
+            "patterns": ["*"],
+            "exclude-patterns": ["actions/attest-build-provenance"],
+        }
+    }
+
+
 def test_portal_is_built_released_and_wired_through_the_server_side_bff() -> None:
     compose = yaml.safe_load(Path("compose.yaml").read_text(encoding="utf-8"))
     portal = compose["services"]["portal"]
