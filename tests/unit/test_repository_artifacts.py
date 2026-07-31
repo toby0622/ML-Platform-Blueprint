@@ -98,6 +98,18 @@ def test_production_mlflow_image_is_built_and_released() -> None:
     assert "psycopg2-binary" in dockerfile
 
 
+def test_python_runtime_images_enforce_known_security_floors() -> None:
+    for path in (
+        Path("Dockerfile"),
+        Path("Dockerfile.pipeline"),
+        Path("infra/images/mlflow/Dockerfile"),
+    ):
+        dockerfile = path.read_text(encoding="utf-8")
+        assert '"msgpack>=1.2.1"' in dockerfile
+        assert '"setuptools>=78.1.1"' in dockerfile
+        assert "python -m pip check" in dockerfile
+
+
 def test_portal_is_built_released_and_wired_through_the_server_side_bff() -> None:
     compose = yaml.safe_load(Path("compose.yaml").read_text(encoding="utf-8"))
     portal = compose["services"]["portal"]

@@ -9,8 +9,13 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 WORKDIR /opt/platform
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN python -m pip install --upgrade pip \
-    && python -m pip install '.[mlflow]' \
+RUN python -m pip install --upgrade \
+    pip \
+    "setuptools>=78.1.1" \
+    && python -m pip install \
+    "msgpack>=1.2.1" \
+    '.[mlflow]' \
+    && python -m pip check \
     && useradd --uid 65532 --no-create-home --shell /usr/sbin/nologin pipeline
 
 USER 65532:65532

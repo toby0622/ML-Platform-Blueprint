@@ -12,6 +12,7 @@ RUN apt-get update \
 RUN python -m pip install --no-cache-dir --upgrade \
     "GitPython>=3.1.51,<4" \
     "Pillow>=12.3.0,<13" \
+    "msgpack>=1.2.1" \
     "pyasn1>=0.6.4,<0.7" \
     "setuptools>=78.1.1" \
     "wheel>=0.46.2,<1" \

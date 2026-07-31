@@ -11,7 +11,13 @@ ENV PATH="/opt/venv/bin:${PATH}"
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install --upgrade pip && pip install '.[mlflow,otel]'
+RUN python -m pip install --upgrade \
+    pip \
+    "setuptools>=78.1.1" \
+    && python -m pip install \
+    "msgpack>=1.2.1" \
+    '.[mlflow,otel]' \
+    && python -m pip check
 
 FROM python:3.12-slim-bookworm AS runtime
 
