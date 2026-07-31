@@ -18,6 +18,8 @@ RUN python -m pip install --no-cache-dir --upgrade \
     "wheel>=0.46.2,<1" \
     "boto3>=1.35,<2" \
     "psycopg2-binary>=2.9.10,<3" \
-    && python -m pip check
+    && python -m pip check \
+    && python -m pip uninstall --yes pip \
+    && python -c "import importlib.util; assert importlib.util.find_spec('pip') is None"
 
 USER 1000:1000

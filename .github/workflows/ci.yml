@@ -241,7 +241,13 @@ jobs:
             validate --samples 100 --data-seed 42 \
             --output /tmp/dataset.npz --metadata /tmp/metadata.json
           docker run --rm --entrypoint python ml-platform-blueprint-mlflow:test \
-            -c "import boto3, mlflow, psycopg2"
+            -c "import importlib.util; import boto3, mlflow, psycopg2; assert importlib.util.find_spec('pip') is None"
+          docker run --rm --entrypoint python ml-platform-blueprint:test \
+            -c "import importlib.util; assert importlib.util.find_spec('pip') is None"
+          docker run --rm --entrypoint /usr/local/bin/python ml-platform-blueprint:test \
+            -c "import importlib.util; assert importlib.util.find_spec('pip') is None"
+          docker run --rm --entrypoint python ml-platform-blueprint-pipeline:test \
+            -c "import importlib.util; assert importlib.util.find_spec('pip') is None"
           docker run --detach --name portal-smoke \
             --publish 127.0.0.1:3000:3000 \
             ml-platform-blueprint-portal:test

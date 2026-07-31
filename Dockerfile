@@ -17,7 +17,9 @@ RUN python -m pip install --upgrade \
     && python -m pip install \
     "msgpack>=1.2.1" \
     '.[mlflow,otel]' \
-    && python -m pip check
+    && python -m pip check \
+    && python -m pip uninstall --yes pip \
+    && python -c "import importlib.util; assert importlib.util.find_spec('pip') is None"
 
 FROM python:3.12-slim-bookworm AS runtime
 
@@ -26,7 +28,9 @@ ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
     ML_PLATFORM_STATE_DIR=/var/lib/ml-platform
 
-RUN groupadd --gid 65532 platform \
+RUN python -m pip uninstall --yes pip \
+    && python -c "import importlib.util; assert importlib.util.find_spec('pip') is None" \
+    && groupadd --gid 65532 platform \
     && useradd --uid 65532 --gid platform --no-create-home --shell /usr/sbin/nologin platform \
     && mkdir -p /var/lib/ml-platform \
     && chown -R platform:platform /var/lib/ml-platform
