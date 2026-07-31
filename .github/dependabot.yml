@@ -14,6 +14,18 @@ updates:
       observability:
         patterns: ["opentelemetry-*"]
         update-types: ["patch", "minor"]
+    ignore:
+      # KFP SDK minor/major upgrades must move with the deployed backend and
+      # complete the compatibility/staging checklist.
+      - dependency-name: kfp
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
+      # Type-checker majors change the validation contract and are promoted
+      # through a bounded manual PR instead of an open-ended version range.
+      - dependency-name: mypy
+        update-types:
+          - version-update:semver-major
   - package-ecosystem: docker
     directory: /
     schedule:
