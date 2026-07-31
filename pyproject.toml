@@ -27,7 +27,7 @@ dev = [
   "ruff>=0.11,<1",
 ]
 mlflow = ["mlflow==3.14.0"]
-kfp = ["kfp==2.16.0"]
+kfp = ["kfp==2.16.1"]
 otel = [
   "opentelemetry-exporter-otlp-proto-http==1.44.0",
   "opentelemetry-instrumentation-fastapi==0.65b0",
@@ -35,7 +35,7 @@ otel = [
 ]
 all = [
   "mlflow==3.14.0",
-  "kfp==2.16.0",
+  "kfp==2.16.1",
   "opentelemetry-exporter-otlp-proto-http==1.44.0",
   "opentelemetry-instrumentation-fastapi==0.65b0",
   "opentelemetry-sdk==1.44.0",
