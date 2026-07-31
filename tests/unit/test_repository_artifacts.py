@@ -151,15 +151,22 @@ def test_dependabot_separates_routine_updates_from_platform_migrations() -> None
     }
     assert "*" not in grouped_python_dependencies
     assert {"kfp", "mlflow"}.isdisjoint(grouped_python_dependencies)
-    pip_ignore = {
-        rule["dependency-name"]: set(rule["update-types"]) for rule in updates["pip"]["ignore"]
-    }
+    pip_ignore = {rule["dependency-name"]: rule for rule in updates["pip"]["ignore"]}
     assert pip_ignore == {
         "kfp": {
-            "version-update:semver-major",
-            "version-update:semver-minor",
+            "dependency-name": "kfp",
+            "versions": [">2.16.0"],
+            "update-types": [
+                "version-update:semver-major",
+                "version-update:semver-minor",
+                "version-update:semver-patch",
+            ],
         },
-        "mypy": {"version-update:semver-major"},
+        "mypy": {
+            "dependency-name": "mypy",
+            "versions": [">=2"],
+            "update-types": ["version-update:semver-major"],
+        },
     }
 
     python_ignore = next(

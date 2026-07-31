@@ -18,12 +18,15 @@ updates:
       # KFP SDK minor/major upgrades must move with the deployed backend and
       # complete the compatibility/staging checklist.
       - dependency-name: kfp
+        versions: [">2.16.0"]
         update-types:
           - version-update:semver-major
           - version-update:semver-minor
+          - version-update:semver-patch
       # Type-checker majors change the validation contract and are promoted
       # through a bounded manual PR instead of an open-ended version range.
       - dependency-name: mypy
+        versions: [">=2"]
         update-types:
           - version-update:semver-major
   - package-ecosystem: docker
